@@ -11,11 +11,12 @@ public class Day1
     public static void main( String[] args )
     {
         System.out.println( "Hello World!" );
+        part1();
         part2();
     }
     public static void part2() {
         int sum = 0;
-        for (String s : Utils.parseInput("day1input2.txt")) {
+        for (String s : Utils.parseInput("day1.txt")) {
             int num = 0;
 
             // find first digit
@@ -63,14 +64,13 @@ public class Day1
                 }
             }
             num += temp;
-            System.out.println(num);
             sum += num;
         }
-        System.out.print(sum);
+        System.out.println(sum);
     }
     public static void part1() {
         int sum = 0;
-        for (String s : Utils.parseInput("day1input1.txt")) {
+        for (String s : Utils.parseInput("day1.txt")) {
             int num = 0;
             char[] allChar = s.toCharArray();
             for (char c : allChar) {
@@ -86,10 +86,9 @@ public class Day1
                     break;
                 }
             }
-            System.out.println(num);
             sum += num;
         }
-        System.out.print(sum);
+        System.out.println(sum);
     }
 
 }

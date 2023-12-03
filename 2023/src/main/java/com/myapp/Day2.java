@@ -10,7 +10,7 @@ public class Day2 {
     }
     public static void part1() {
         int sum = 0;
-        List<String> inputs = Utils.parseInput("day2input1.txt");
+        List<String> inputs = Utils.parseInput("day2.txt");
         for (int i = 0; i < inputs.size(); i++) {
             String s = inputs.get(i);
             int id = i+1;
@@ -45,7 +45,7 @@ public class Day2 {
     public static void part2() {
         int sum = 0;
 //        List<String> inputs = Utils.parseInput("test.txt");
-        List<String> inputs = Utils.parseInput("day2input1.txt");
+        List<String> inputs = Utils.parseInput("day2.txt");
         for (int i = 0; i < inputs.size(); i++) {
             String s = inputs.get(i);
             String gameString = s.split(":")[1].trim();
