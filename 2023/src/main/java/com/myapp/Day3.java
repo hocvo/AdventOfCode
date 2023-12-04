@@ -61,45 +61,10 @@ public class Day3 {
     public static boolean isAdjecentToSymbol (char[][]a, List<Pair<Integer,Integer>> indexList,
             int cNum, int rNum, char symbol) {
         for (Pair<Integer,Integer> index : indexList) {
-            //top left
-            Pair<Integer,Integer> tl = new Pair<>(index.getKey()-1,index.getValue()-1);
-            if (isSymbol(a, tl.getKey(), tl.getValue(), cNum, rNum, symbol)) {
-                return true;
-            }
-            //top
-            Pair<Integer,Integer> t = new Pair<>(index.getKey()-1,index.getValue());
-            if (isSymbol(a, t.getKey(), t.getValue(), cNum, rNum, symbol)) {
-                return true;
-            }
-            //top right
-            Pair<Integer,Integer> tr = new Pair<>(index.getKey()-1,index.getValue()+1);
-            if (isSymbol(a, tr.getKey(), tr.getValue(), cNum, rNum, symbol)) {
-                return true;
-            }
-            //right
-            Pair<Integer,Integer> r = new Pair<>(index.getKey(),index.getValue()+1);
-            if (isSymbol(a, r.getKey(), r.getValue(), cNum, rNum, symbol)) {
-                return true;
-            }
-            //bottom right
-            Pair<Integer,Integer> br = new Pair<>(index.getKey()+1,index.getValue()+1);
-            if (isSymbol(a, br.getKey(), br.getValue(), cNum, rNum, symbol)) {
-                return true;
-            }
-            //bottom
-            Pair<Integer,Integer> b = new Pair<>(index.getKey()+1,index.getValue());
-            if (isSymbol(a, b.getKey(), b.getValue(), cNum, rNum, symbol)) {
-                return true;
-            }
-            //bottom left
-            Pair<Integer,Integer> bl = new Pair<>(index.getKey()+1,index.getValue()-1);
-            if (isSymbol(a, bl.getKey(), bl.getValue(), cNum, rNum, symbol)) {
-                return true;
-            }
-            //left
-            Pair<Integer,Integer> l = new Pair<>(index.getKey(),index.getValue()-1);
-            if (isSymbol(a, l.getKey(), l.getValue(), cNum, rNum, symbol)) {
-                return true;
+            for (Pair<Integer,Integer> neighbor : Utils.getAdjecentToSymbolIndex(a, index, true)) {
+                if (isSymbol(a, neighbor.getKey(), neighbor.getValue(), cNum, rNum, symbol)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -107,45 +72,10 @@ public class Day3 {
     public static Pair<Integer,Integer> getAdjecentToSymbolIndex(char[][]a, List<Pair<Integer,Integer>> indexList,
             int cNum, int rNum, char symbol) {
         for (Pair<Integer,Integer> index : indexList) {
-            //top left
-            Pair<Integer,Integer> tl = new Pair<>(index.getKey()-1,index.getValue()-1);
-            if (isSymbol(a, tl.getKey(), tl.getValue(), cNum, rNum, symbol)) {
-                return tl;
-            }
-            //top
-            Pair<Integer,Integer> t = new Pair<>(index.getKey()-1,index.getValue());
-            if (isSymbol(a, t.getKey(), t.getValue(), cNum, rNum, symbol)) {
-                return t;
-            }
-            //top right
-            Pair<Integer,Integer> tr = new Pair<>(index.getKey()-1,index.getValue()+1);
-            if (isSymbol(a, tr.getKey(), tr.getValue(), cNum, rNum, symbol)) {
-                return tr;
-            }
-            //right
-            Pair<Integer,Integer> r = new Pair<>(index.getKey(),index.getValue()+1);
-            if (isSymbol(a, r.getKey(), r.getValue(), cNum, rNum, symbol)) {
-                return r;
-            }
-            //bottom right
-            Pair<Integer,Integer> br = new Pair<>(index.getKey()+1,index.getValue()+1);
-            if (isSymbol(a, br.getKey(), br.getValue(), cNum, rNum, symbol)) {
-                return br;
-            }
-            //bottom
-            Pair<Integer,Integer> b = new Pair<>(index.getKey()+1,index.getValue());
-            if (isSymbol(a, b.getKey(), b.getValue(), cNum, rNum, symbol)) {
-                return b;
-            }
-            //bottom left
-            Pair<Integer,Integer> bl = new Pair<>(index.getKey()+1,index.getValue()-1);
-            if (isSymbol(a, bl.getKey(), bl.getValue(), cNum, rNum, symbol)) {
-                return bl;
-            }
-            //left
-            Pair<Integer,Integer> l = new Pair<>(index.getKey(),index.getValue()-1);
-            if (isSymbol(a, l.getKey(), l.getValue(), cNum, rNum, symbol)) {
-                return l;
+            for (Pair<Integer,Integer> neighbor : Utils.getAdjecentToSymbolIndex(a, index, true)) {
+                if (isSymbol(a, neighbor.getKey(), neighbor.getValue(), cNum, rNum, symbol)) {
+                    return neighbor;
+                }
             }
         }
         return null;
