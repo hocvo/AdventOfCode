@@ -61,7 +61,7 @@ public class Day3 {
     public static boolean isAdjecentToSymbol (char[][]a, List<Pair<Integer,Integer>> indexList,
             int cNum, int rNum, char symbol) {
         for (Pair<Integer,Integer> index : indexList) {
-            for (Pair<Integer,Integer> neighbor : Utils.getAdjecentToSymbolIndex(a, index, true)) {
+            for (Pair<Integer,Integer> neighbor : Utils.getAdjecentToIndex(a, index, true)) {
                 if (isSymbol(a, neighbor.getKey(), neighbor.getValue(), cNum, rNum, symbol)) {
                     return true;
                 }
@@ -72,7 +72,7 @@ public class Day3 {
     public static Pair<Integer,Integer> getAdjecentToSymbolIndex(char[][]a, List<Pair<Integer,Integer>> indexList,
             int cNum, int rNum, char symbol) {
         for (Pair<Integer,Integer> index : indexList) {
-            for (Pair<Integer,Integer> neighbor : Utils.getAdjecentToSymbolIndex(a, index, true)) {
+            for (Pair<Integer,Integer> neighbor : Utils.getAdjecentToIndex(a, index, true)) {
                 if (isSymbol(a, neighbor.getKey(), neighbor.getValue(), cNum, rNum, symbol)) {
                     return neighbor;
                 }

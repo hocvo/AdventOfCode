@@ -23,7 +23,7 @@ public class Utils {
         return new ArrayList<>();
     }
     
-    public static List<Pair<Integer,Integer>> getAdjecentToSymbolIndex(char[][]a, Pair<Integer,Integer> index, boolean includeDiagonal) {
+    public static List<Pair<Integer,Integer>> getAdjecentToIndex(char[][]a, Pair<Integer,Integer> index, boolean includeDiagonal) {
         int[] neighborIndex = {-1,0,1};
         List<Pair<Integer,Integer>> result = new ArrayList<>();
         int r = index.getKey();
@@ -32,6 +32,26 @@ public class Utils {
             for (int cNeighbor : neighborIndex) {
                 if (!includeDiagonal && rNeighbor+cNeighbor != 1) continue; // up, down, left, right neighbor indices always add up to 1. 
                 if (r == rNeighbor && c == cNeighbor) continue;
+                Pair<Integer,Integer> neighbor = new Pair<>(r + rNeighbor, c + cNeighbor);
+                result.add(neighbor);
+            }
+        }
+        return result;
+    }
+    public static List<Pair<Integer,Integer>> getAdjecentToIndex2(char[][]a, Pair<Integer,Integer> index, boolean includeDiagonal) {
+        int[] neighborIndex = {-1,0,1};
+        List<Pair<Integer,Integer>> result = new ArrayList<>();
+        int r = index.getKey();
+        int c = index.getValue();
+        for (int rNeighbor : neighborIndex) {
+            for (int cNeighbor : neighborIndex) {
+                if (!includeDiagonal) {
+                    if (rNeighbor+cNeighbor == 1 || rNeighbor+cNeighbor == -1);
+                    else continue; // up, down, left, right neighbor indices always add up to 1. 
+                }
+                if (r + rNeighbor == rNeighbor && c + cNeighbor == cNeighbor) continue;
+                if (r + rNeighbor < 0 || r + rNeighbor >= a.length) continue;
+                if (c + cNeighbor < 0 || c + cNeighbor >= a[0].length) continue;
                 Pair<Integer,Integer> neighbor = new Pair<>(r + rNeighbor, c + cNeighbor);
                 result.add(neighbor);
             }
