@@ -1,20 +1,14 @@
 package com.myapp;
 
+import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
-
-import javafx.util.Pair;
 
 public class Day8
 {
@@ -57,53 +51,71 @@ public class Day8
     {
 
         long start = System.currentTimeMillis();
-        long step = 0;
-        Set<String> locList = map.keySet().stream()
+//        int inNum = ins.size();
+        // find all steps to Z from any loc
+        // DOES NOT NEEDED. Assume always perfect loop. Offset always 0
+//        Integer[] insArray = ins.toArray(new Integer[0]);
+//        Map<String,Map<Long,Long>> offsetMap = new HashMap<>();
+//        for (String loc : map.keySet()) {
+//            Map<Long,Long> offsetM = new HashMap<>();
+//            for (long i = 0; i < insArray.length; i++) {
+//                offsetM.put(i, calculateStep(ins,i,loc,map));
+//            }
+//            offsetMap.put(loc, offsetM);
+//        }
+        List<String> locList = map.keySet().stream()
             .filter(loc -> loc.endsWith("A"))
-            .collect(Collectors.toSet());
-        Set<String> endLocList = map.keySet().stream()
-            .filter(loc -> loc.endsWith("Z"))
-            .collect(Collectors.toSet());
-        locList.addAll(endLocList);
-        int insLen = ins.size();
-        //TODO Cache the result every step
-        Map<String,Set<Long>> cache = new HashMap<>();
-        for (String loc : locList) {
-            if (cache.containsKey(loc)) {
-                continue;
-            }
-            for (String zLoc : endLocList) {
-                Set<String> seenAgainAtIndex = new HashSet<>();
-                boolean isFound = true;
-                long stepTmp = 0;
-                String tmpLoc = loc;
-                int i = 0;
-                while(!tmpLoc.equals(zLoc)) {
-//                    if (seen.contains(tmpLoc)) {
-//                        isFound = false;
-//                        break; // fall in to infinite loop
-//                    }
-                    seenAgainAtIndex.add(tmpLoc);
-                    int instruction = ins.poll();
-                    stepTmp++;
-                    tmpLoc = map.get(tmpLoc)[instruction];
-                    // put back to queue to loop as needed
-                    ins.add(instruction);
-                    i++;
-                }
-                if (isFound) {
-                    Set<Long> steps = cache.getOrDefault(loc, new HashSet<>());
-                    steps.add(stepTmp);
-                    cache.put(loc, steps);
-                }
-            }
+            .collect(Collectors.toList());
+        long[] steps = new long[locList.size()];
+
+        for (int i = 0; i < steps.length; i++) {
+            String loc = locList.get(i);
+            steps[i] = calculateStep(ins, 0, loc, map);
         }
+
+        long result = calculateLCM(steps);
         long stop = System.currentTimeMillis();
-        System.out.println(step);
+        System.out.println(result);
         System.out.println("Time: " + (stop-start));
     }
 
+    static class OffsetMap {
+        String loc;
+        // off set and the step to Z
+        Map<Integer,Integer> map = new HashMap<>();
+    }
+    static long calculateStep(Queue<Integer> ins, long offset, String loc, Map<String,String[]> map) {
+        long step = 0;
+        while (offset-- > 0) {
+            // put offset back to end of queue
+            ins.add(ins.poll());
+        }
+        while(!ins.isEmpty() && !loc.endsWith("Z")) {
+            int instruction = ins.poll();
+            loc = map.get(loc)[instruction];
+            step++;
+            // put back to queue to loop as needed
+            ins.add(instruction);
+        }
+        return step;
+    }
     static boolean isFinish(Collection<String> list) {
         return list.stream().allMatch(l -> l.endsWith("Z"));
+    }
+    static boolean isDone(long[] steps) {
+        if (steps[0] == 0) return false;
+        return Arrays.stream(steps).distinct().count() == 1;
+    }
+    static long calculateLCM(long [] steps) {
+        long lcm = steps[0];
+        for (int i = 1; i < steps.length; i++) {
+            lcm = lcm(lcm, steps[i]);
+        }
+        return lcm;
+    }
+    static long lcm(long a, long b) {
+        BigInteger A = BigInteger.valueOf(a);
+        BigInteger B = BigInteger.valueOf(b);
+        return a * (b / A.gcd(B).longValue());
     }
 }
