@@ -19,7 +19,7 @@ public class Day10
     public static void main (String[] args)
     {
         System.out.println("Hello World!");
-        List<String> inputs = Utils.parseInput("test.txt");
+        List<String> inputs = Utils.parseInput("day10.txt");
         int numRow = inputs.size();
         int numCol = inputs.get(0).length();
         char [][] tiles = new char [numRow][numCol];
@@ -54,123 +54,24 @@ public class Day10
             int curStep = steps[r][c];
             List<Pair<Integer,Integer>> neighbors = Utils.getAdjecentToIndex2(tiles, loc, false);
             char pipe = tiles[r][c];
-            switch (pipe) {
-            case 'S':
-                for (Pair<Integer,Integer> n : neighbors) {
-                    int row = n.getKey();
-                    int col = n.getValue();
-                    char ch = tiles[row][col];
-                    if (ch == '.' || seen.contains(n)) continue;
-                    if (ch == 'L' && (row < r || col > c)) continue;
-                    if (ch == '7' && (row > r || col < c)) continue;
-                    if (ch == 'J' && (row < r || col < c)) continue;
-                    if (ch == 'F' && (row > r || col > c)) continue;
-                    if (ch == '-' && row != r) continue;
-                    if (ch == '|' && col != c) continue;
+            for (Pair<Integer,Integer> n : neighbors) {
+                if (seen.contains(n)) continue;
+                int row = n.getKey();
+                int col = n.getValue();
+                if (isAllowed(pipe, row, col, tiles, r, c)) {
                     steps[n.getKey()][n.getValue()] = curStep+1;
                     q.add(n);
+                    maxStep = Math.max(maxStep,curStep+1);
                 }
-                break;
-            case 'F':
-                for (Pair<Integer,Integer> n : neighbors) {
-                    int row = n.getKey();
-                    int col = n.getValue();
-                    char ch = tiles[row][col];
-                    if (ch == '.' || seen.contains(n)) continue;
-                    if (row < r || col < c) continue;
-                    if ((ch == '|' || ch == 'L')
-                            && col != c && row != r+1) continue;
-                    if ((ch == '-' || ch == '7')
-                            && row != r && col != c+1) continue;
-                    steps[row][col] = curStep+1;
-                    q.add(n);
-                    if (maxStep < curStep+1) maxStep = curStep+1;
-                }
-                break;
-            case '7':
-                for (Pair<Integer,Integer> n : neighbors) {
-                    int row = n.getKey();
-                    int col = n.getValue();
-                    char ch = tiles[row][col];
-                    if (ch == '.' || seen.contains(n)) continue;
-                    if (row < r || col > c) continue;
-                    if ((ch == '|' || ch == 'J')
-                            && col != c && row != r+1) continue;
-                    if ((ch == '-' || ch == 'F')
-                            && row != r && col != c-1) continue;
-                    steps[row][col] = curStep+1;
-                    q.add(n);
-                    if (maxStep < curStep+1) maxStep = curStep+1;
-                }
-                break;
-            case 'J':
-                for (Pair<Integer,Integer> n : neighbors) {
-                    int row = n.getKey();
-                    int col = n.getValue();
-                    char ch = tiles[row][col];
-                    if (ch == '.' || seen.contains(n)) continue;
-                    if (row > r || col > c) continue;
-                    if ((ch == '|' || ch == '7')
-                            && col != c && row != r-1) continue;
-                    if ((ch == '-' || ch == 'L')
-                            && row != r && col != c-1) continue;
-                    steps[row][col] = curStep+1;
-                    q.add(n);
-                    if (maxStep < curStep+1) maxStep = curStep+1;
-                }
-                break;
-            case 'L':
-                for (Pair<Integer,Integer> n : neighbors) {
-                    int row = n.getKey();
-                    int col = n.getValue();
-                    char ch = tiles[row][col];
-                    if (ch == '.' || seen.contains(n)) continue;
-                    if (row > r || col < c) continue;
-                    if ((ch == '|' || ch == 'F')
-                            && col != c && row != r-1) continue;
-                    if ((ch == '-' || ch == 'J')
-                            && row != r && col != c+1) continue;
-                    steps[row][col] = curStep+1;
-                    q.add(n);
-                    if (maxStep < curStep+1) maxStep = curStep+1;
-                }
-                break;
-            case '-':
-                for (Pair<Integer,Integer> n : neighbors) {
-                    int row = n.getKey();
-                    int col = n.getValue();
-                    char ch = tiles[row][col];
-                    if (ch == '.' || seen.contains(n)) continue;
-                    if (row != r || ch == '|') continue;
-                    steps[row][col] = curStep+1;
-                    q.add(n);
-                    if (maxStep < curStep+1) maxStep = curStep+1;
-                }
-                break;
-            case '|':
-                for (Pair<Integer,Integer> n : neighbors) {
-                    int row = n.getKey();
-                    int col = n.getValue();
-                    char ch = tiles[row][col];
-                    if (ch == '.' || seen.contains(n)) continue;
-                    if (col != c || ch == '-') continue;
-                    steps[row][col] = curStep+1;
-                    q.add(n);
-                    if (maxStep < curStep+1) maxStep = curStep+1;
-                }
-                break;
-            default:
-                // char . for ground
-                break;
             }
-
-            for (int[] columns : steps) {
-                for (int step : columns) {
-                    System.out.printf("%3d",step);
-                }
-                System.out.println();
-            }
-            System.out.println();
+//         
+//            for (int[] columns : steps) {
+//                for (int step : columns) {
+//                    System.out.printf("%3d",step);
+//                }
+//                System.out.println();
+//            }
+//            System.out.println();
         }
 
         long stop = System.currentTimeMillis();
@@ -191,31 +92,47 @@ public class Day10
             }
         }
 //        steps[startIndex.getKey()][startIndex.getValue()] = -1;
+        
+        // process all tiles that's not a part of the loop
         Set<Pair<Integer,Integer>> seen = new HashSet<>();
         while (!q.isEmpty()) {
             Pair<Integer,Integer> loc = q.poll();
             if (seen.contains(loc)) continue;
             seen.add(loc);
+            // for each tile, expand until hit outer edge, or the loop's edges
             Queue<Pair<Integer,Integer>> qt = new ArrayDeque<>();
             Set<Pair<Integer,Integer>> connected = new HashSet<>();
+            int connectedNum = 1; // include the processing tile itself
             qt.add(loc);
             while (!qt.isEmpty()) {
                 if (seen.contains(loc)) continue;
                 seen.add(loc);
+                int r = loc.getKey();
+                int c = loc.getValue();
+                char pipe = tiles[r][c];
                 boolean isOut = false;
                 List<Pair<Integer,Integer>> neighbors = Utils.getAdjecentToIndex2(tiles, loc, false);
                 for (Pair<Integer,Integer> n : neighbors) {
-                    int row = loc.getKey();
-                    int col = loc.getValue();
+                    int row = n.getKey();
+                    int col = n.getValue();
                     if (!loop.contains(n)) {
-                        connected.add(n);
+//                        connected.add(n);
+                        connectedNum++;
                         qt.add(n);
                     }
-                    else if (row == 0 || col == 0) {
+                    else if (row == 0 || col == 0
+                            || row == tiles.length -1 || col == tiles[0].length) {
                         // hit outer edge, must be outside
                         // reset connected and break
                         isOut = true;
+                        connectedNum = 0;
                         break;
+                    }
+                    else {
+                        if (!isIn(pipe, row, col, tiles, r, c)) {
+                            isOut = true;
+                            break;
+                        }
                     }
                 }
                 if (isOut) break;
@@ -225,5 +142,96 @@ public class Day10
         long stop = System.currentTimeMillis();
         System.out.println(sum);
         System.out.println((stop-start));
+    }
+    static boolean isAllowed(char pipe, int row, int col,
+            char[][] tiles, int r, int c) {
+        char ch = tiles[row][col];
+        if (ch == '.') return false;
+        switch (pipe) {
+        case 'S':
+            if (ch == 'L' && (row < r || col > c)) return false;
+            if (ch == '7' && (row > r || col < c)) return false;
+            if (ch == 'J' && (row < r || col < c)) return false;
+            if (ch == 'F' && (row > r || col > c)) return false;
+            if (ch == '-' && row != r) return false;
+            if (ch == '|' && col != c) return false;
+            break;
+        case 'F':
+            if (row < r || col < c) return false;
+            if ((ch == '|' || ch == 'L')
+                    && col != c && row != r+1) return false;
+            if ((ch == '-' || ch == '7')
+                    && row != r && col != c+1) return false;
+            break;
+        case '7':
+                if (row < r || col > c) return false;
+                if ((ch == '|' || ch == 'J')
+                        && col != c && row != r+1) return false;
+                if ((ch == '-' || ch == 'F')
+                        && row != r && col != c-1) return false;
+            break;
+        case 'J':
+                if (row > r || col > c) return false;
+                if ((ch == '|' || ch == '7')
+                        && col != c && row != r-1) return false;
+                if ((ch == '-' || ch == 'L')
+                        && row != r && col != c-1) return false;
+            break;
+        case 'L':
+                if (row > r || col < c) return false;
+                if ((ch == '|' || ch == 'F')
+                        && col != c && row != r-1) return false;
+                if ((ch == '-' || ch == 'J')
+                        && row != r && col != c+1) return false;
+            break;
+        case '-':
+                if (row != r || ch == '|') return false;
+            break;
+        case '|':
+                if (col != c || ch == '-') return false;
+            break;
+        default:
+            // char . for ground
+            break;
+        }
+        return true;
+    }
+    static boolean isIn(char pipe, int row, int col,
+            char[][] tiles, int r, int c) {
+        char ch = tiles[row][col];
+        switch (pipe) {
+        case 'F':
+            if (row < r || col < c) return false;
+            if ((ch == '|' || ch == 'L')
+                    && col != c && row != r+1) return false;
+            if ((ch == '-' || ch == '7')
+                    && row != r && col != c+1) return false;
+            break;
+        case '7':
+                if (row < r || col > c) return false;
+                if ((ch == '|' || ch == 'J')
+                        && col != c && row != r+1) return false;
+                if ((ch == '-' || ch == 'F')
+                        && row != r && col != c-1) return false;
+            break;
+        case 'J':
+                if (row > r || col > c) return false;
+                if ((ch == '|' || ch == '7')
+                        && col != c && row != r-1) return false;
+                if ((ch == '-' || ch == 'L')
+                        && row != r && col != c-1) return false;
+            break;
+        case 'L':
+                if (row > r || col < c) return false;
+                if ((ch == '|' || ch == 'F')
+                        && col != c && row != r-1) return false;
+                if ((ch == '-' || ch == 'J')
+                        && row != r && col != c+1) return false;
+            break;
+        default:
+            // char . for ground
+            break;
+        }
+        return true;
     }
 }
