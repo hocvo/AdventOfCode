@@ -52,7 +52,7 @@ public class Day10
             int r = loc.getKey();
             int c = loc.getValue();
             int curStep = steps[r][c];
-            List<Pair<Integer,Integer>> neighbors = Utils.getAdjecentToIndex2(tiles, loc, false);
+            List<Pair<Integer,Integer>> neighbors = Utils.getAdjecentToIndex(tiles, loc, false);
             char pipe = tiles[r][c];
             for (Pair<Integer,Integer> n : neighbors) {
                 if (seen.contains(n)) continue;
@@ -111,7 +111,7 @@ public class Day10
                 int c = loc.getValue();
                 char pipe = tiles[r][c];
                 boolean isOut = false;
-                List<Pair<Integer,Integer>> neighbors = Utils.getAdjecentToIndex2(tiles, loc, false);
+                List<Pair<Integer,Integer>> neighbors = Utils.getAdjecentToIndex(tiles, loc, false);
                 for (Pair<Integer,Integer> n : neighbors) {
                     int row = n.getKey();
                     int col = n.getValue();
