@@ -1,16 +1,10 @@
 package com.myapp;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import javafx.util.Pair;
 
 @SuppressWarnings("restriction")
@@ -20,15 +14,15 @@ public class Day12
     public static void main (String[] args)
     {
         System.out.println("Hello World!");
-        List<String> inputs = Utils.parseInput("test.txt");
+        List<String> inputs = Utils.parseInput("day12.txt");
         List<Pair<String,String>> in = inputs.stream()
                 .map(s -> new Pair<String,String>(s.split("\\s")[0],s.split("\\s")[1]))
                 .collect(Collectors.toList());
-        char[] test = {'.','#','#','#','.','#','.','#','.','#','.','.'};
-        int [] test2 = {3,2,1};
-        System.out.println(quickCheck(test,test2));
+//        char[] test = {'.','#','#','#','.','#','.','#','.','#','.','.'};
+//        int [] test2 = {3,2,1};
+//        System.out.println(quickCheck(test,test2));
         part1(in);
-//        part2(gal, galIndex, galCount, rowNeedExpand, colneedExpand);
+//        part2(in);
     }
 
     public static void part1 (List<Pair<String,String>> in)
@@ -37,13 +31,39 @@ public class Day12
         long sum = 0;
         
         for (Pair<String,String> p : in) {
-            char[] puzzle = p.getKey().toCharArray();
+            String tmp = p.getKey();
+            char[] puzzle = tmp.toCharArray();
             int[] expect = Arrays.stream(p.getValue().split(","))
                     .mapToInt(s->Integer.parseInt(s))
                     .toArray();
             Set<String> seen = new HashSet<>();
             sum += dfsBruteForce(Arrays.copyOf(puzzle, puzzle.length), expect, seen);
-//            System.out.println(isMatched(puzzle, expect));
+        }
+        long stop = System.currentTimeMillis();
+        System.out.println("result: " + sum);
+        System.out.println((stop-start));
+    }
+    public static void part2 (List<Pair<String,String>> in)
+    {
+        long start = System.currentTimeMillis();
+        long sum = 0;
+        
+        for (Pair<String,String> p : in) {
+            String tmp = p.getKey();
+            String pTmp = "?" + tmp;
+            for (int i = 0; i < 5; i++) {
+                tmp += pTmp;
+            }
+            char[] puzzle = tmp.toCharArray();
+            int[] etmp = Arrays.stream(p.getValue().split(","))
+                    .mapToInt(s->Integer.parseInt(s))
+                    .toArray();
+            int[] expect = new int[etmp.length*5];
+            for (int i = 0; i < expect.length; i++) {
+                expect[i] = etmp[i%etmp.length];
+            }
+            Set<String> seen = new HashSet<>();
+            sum += dfsBruteForce(Arrays.copyOf(puzzle, puzzle.length), expect, seen);
         }
         long stop = System.currentTimeMillis();
         System.out.println("result: " + sum);
@@ -65,9 +85,9 @@ public class Day12
                 sum++;
             return sum;
         }
-//        if (!quickCheck(p, expected)) {
-//            return sum;
-//        }
+        if (!quickCheck(p, expected)) {
+            return sum;
+        }
         if (p[i] == '?') {
             p[i] = '#';
             sum += isMatched(Arrays.copyOf(p, p.length) , i+1, '#', expected, seen);
@@ -91,7 +111,7 @@ public class Day12
             if (tagCount != expected[i])
                 return false;
         }
-        return false;
+        return true;
     }
     static boolean isMatched(char[] p, int[] expected) {
         int i = 0;
