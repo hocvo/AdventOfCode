@@ -21,8 +21,8 @@ public class Day12
 //        char[] test = {'.','#','#','#','.','#','.','#','.','#','.','.'};
 //        int [] test2 = {3,2,1};
 //        System.out.println(quickCheck(test,test2));
-        part1(in);
-//        part2(in);
+//        part1(in);
+        part2(in);
     }
 
     public static void part1 (List<Pair<String,String>> in)
@@ -37,7 +37,9 @@ public class Day12
                     .mapToInt(s->Integer.parseInt(s))
                     .toArray();
             Set<String> seen = new HashSet<>();
-            sum += dfsBruteForce(Arrays.copyOf(puzzle, puzzle.length), expect, seen);
+            long output = dfsBruteForce(Arrays.copyOf(puzzle, puzzle.length), expect, seen);
+            sum += output;
+            System.out.println("result: " + sum);
         }
         long stop = System.currentTimeMillis();
         System.out.println("result: " + sum);
@@ -63,7 +65,8 @@ public class Day12
                 expect[i] = etmp[i%etmp.length];
             }
             Set<String> seen = new HashSet<>();
-            sum += dfsBruteForce(Arrays.copyOf(puzzle, puzzle.length), expect, seen);
+            long output = dfsBruteForce(Arrays.copyOf(puzzle, puzzle.length), expect, seen);
+            sum += output;
         }
         long stop = System.currentTimeMillis();
         System.out.println("result: " + sum);
