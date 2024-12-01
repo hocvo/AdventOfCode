@@ -34,7 +34,7 @@ public class Day10
             }
         }
         int [][] steps = part1(tiles, start);
-        part2(tiles, steps, start);
+        part2Visual(tiles, steps, start);
     }
 
     public static int[][] part1 (char[][] tiles, Pair<Integer,Integer> startIndex)
@@ -79,6 +79,21 @@ public class Day10
         System.out.println((stop-start));
         loop = seen;
         return steps;
+    }
+    public static void part2Visual(char[][] tiles, int[][]steps, Pair<Integer,Integer> startIndex) {
+        steps[startIndex.getKey()][startIndex.getValue()] = 1;
+        for (int i = 0; i < steps.length; i++) {
+            for (int j = 0; j < steps[0].length; j++) {
+                if (steps[i][j] > 0) {
+                    System.out.print(tiles[i][j]);
+                }
+                else {
+                    System.out.print(0);
+                }
+                
+            }
+            System.out.println();
+        }
     }
     public static void part2(char[][] tiles, int[][]steps, Pair<Integer,Integer> startIndex)
     {
