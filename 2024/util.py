@@ -49,4 +49,30 @@ def sort(word):
         out += c
     return out
 
+def column(matrix, i):
+    return [row[i] for row in matrix]
+    
+# def diagonal(matrix, i):
+    # return [row[i] for row in matrix]
+    
+def diagonalForward(matrix, i,j):
+    l = list()
+    c = j
+    maxCol = len(matrix[0])
+    for r in range(i,len(matrix)):
+        if c >= maxCol:
+            break;
+        l.append(matrix[r][c])
+        c += 1
+    return l
 
+def diagonalBackward(matrix, i,j):
+    l = list()
+    c = j
+    maxCol = len(matrix[0])
+    for r in range(i,len(matrix)):
+        if c < 0:
+            break;
+        l.append(matrix[r][c])
+        c -= 1
+    return l
