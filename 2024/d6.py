@@ -15,6 +15,7 @@ def part1():
 
 #part 2
 def part2():
+    count = 0
     print(count)
 
 part1()
