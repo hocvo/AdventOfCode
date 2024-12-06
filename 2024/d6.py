@@ -17,8 +17,8 @@ def part1():
     start = tuple()
     found = False
     steps = set()
-    for r in range(len(lines)):
-        for c in range(len(lines[0])):
+    for r in range(R):
+        for c in range(C):
             if lines[r][c] in guardPos:
                 start = (r,c)
                 found = True
@@ -45,60 +45,45 @@ def part1():
             cur = nextMove
     print(len(steps))
 
-def hitLoop(pos, steps):
-    face = guardPos[(guardPos.index(pos[2]) + 1) % 4]
-    m = moves[guardPos.index(face)]
-    cur = (pos[0]+m[0],pos[1]+m[1],face)
-    steps2 = set(steps)
-    while cur[0] >= 0 and cur[0] < R and cur[1] >= 0 and cur[1] < C:
-        steps2.add(cur)
-        if cur in steps2:
-            return True
-        if lines[cur[0]][cur[1]] == "#":
-            face = guardPos[(guardPos.index(cur[2]) + 1) % 4]
-            cur = (cur[0],cur[1],face)
-        m = moves[guardPos.index(face)]
-        cur = (cur[0]+m[0],cur[1]+m[1],face)
-        # print("loop test ", cur)
-    return False
-
-#part 2
 def part2():
     count = 0
     start = tuple()
     found = False
-    for r in range(len(lines)):
-        for c in range(len(lines[0])):
+    for r in range(R):
+        for c in range(C):
             if lines[r][c] in guardPos:
                 start = (r,c,lines[r][c])
                 found = True
                 break
         if found:
             break
-    cur = start
-    face = lines[start[0]][start[1]]
-    steps = set()
-    while cur[0] >= 0 and cur[0] < R and cur[1] >= 0 and cur[1] < C:
-        if hitLoop(cur, steps):
-            count += 1
-            # print("found loop at: ", cur)
-        # print("adding ", cur)
-        steps.add(cur)
-        m = moves[guardPos.index(face)]
-        nextMove = (cur[0]+m[0],cur[1]+m[1],face)
-        if nextMove[0] >= 0 and nextMove[0] < R and nextMove[1] >= 0 and nextMove[1] < C and lines[nextMove[0]][nextMove[1]] == "#": #need to turn
-            # print("hit wall :", nextMove)
-            face = guardPos[(guardPos.index(face) + 1) % 4]
-            # steps.add((cur[0],cur[1],face))
-            # print("adding ", (cur[0],cur[1],face))
-            cur = (cur[0],cur[1],face)
-            # print ("hit wall :", nextMove, " turn to ", face)
-            # print ("turn to ", face)
-        else:
-            # print(nextMove)
-            cur = nextMove
+    for r in range(R):
+        for c in range(C):            
+            cur = start
+            face = lines[start[0]][start[1]]
+            steps = set()
+            while cur[0] >= 0 and cur[0] < R and cur[1] >= 0 and cur[1] < C:
+                if cur in steps:
+                    count += 1
+                    print("found loop at: ", cur, "count=",count)
+                    break
+                # print("adding ", cur)
+                steps.add(cur)
+                m = moves[guardPos.index(face)]
+                nextMove = (cur[0]+m[0],cur[1]+m[1],face)
+                nm = (cur[0]+m[0],cur[1]+m[1])
+                if nextMove[0] >= 0 and nextMove[0] < R and nextMove[1] >= 0 and nextMove[1] < C and (lines[nextMove[0]][nextMove[1]] == "#" or nm == (r,c)): #need to turn
+                    # print("hit wall :", nextMove)
+                    face = guardPos[(guardPos.index(face) + 1) % 4]
+                    # steps.add((cur[0],cur[1],face))
+                    # print("adding ", (cur[0],cur[1],face))
+                    cur = (cur[0],cur[1],face)
+                    # print ("hit wall :", nextMove, " turn to ", face)
+                    # print ("turn to ", face)
+                else:
+                    # print(nextMove)
+                    cur = nextMove
     print(count)
 
 part1()
-part2() #442 toolow,
-# 773, 5801 not the right answer
+part2()
