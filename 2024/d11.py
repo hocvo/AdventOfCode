@@ -9,8 +9,9 @@ lines = util.parse('d11.txt')
 # dict(): {k:v, k:v, ...}
 # tuple():  An ordered, immutable collection of items (e.g., (1, 2, "apple"))
 # range: Represents a sequence of numbers (e.g., range(5), range(1, 5), range(1,5,2))
-# lines = ["12345"]
-def main2():
+seen = dict()
+blinks = 75
+def main2(): # too long to do insert. even longer than main()
     stones = lines[0].split(' ')
     stones = [int(x) for x in stones]
     for blink in range(25):
@@ -32,11 +33,35 @@ def main2():
             i += 1
     #print(stones)
     print(len(stones))
-def main():
+def main3():
+    count = 0
+    stones = lines[0].split(' ')
+    stones = [int(x) for x in stones]
+    for s in stones:
+        count += recurse(s,blinks)
+    print(count)
+def recurse(s, blink):
+    if blink == 0:
+        return 1
+    count = 0
+    if (s,blink) in seen:
+        return seen[(s,blink)]
+    if s == 0:
+        count += recurse(1,blink-1)
+    elif len(str(s)) % 2 == 0:
+        ss = str(s)
+        mid = int(len(ss) / 2)
+        count += recurse(int(ss[:mid]), blink-1)
+        count += recurse(int(ss[mid:]), blink-1)
+    else:
+        count += recurse(s*2024,blink-1)
+    seen[(s,blink)] = count
+    return count
+def main(): #does not work for part 2. take too long
     stones = lines[0].split(' ')
     stones = [int(x) for x in stones]
     seen = dict()
-    for blink in range(75):
+    for blink in range(blinks):
         tmp = list()
         for s in stones:
             if s == 0:
@@ -61,10 +86,10 @@ def main():
     print(len(stones))
 
 start = time.time()
-main()
+#main()
 stop = time.time()
 print("Main run in: ", stop-start, "seconds")
 start = time.time()
-#main2()
+main3()
 stop = time.time()
 print("Main2 run in: ", stop-start, "seconds")
