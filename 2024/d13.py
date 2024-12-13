@@ -1,7 +1,7 @@
 import util
 import time
 import re
-lines = util.parse('test.txt')
+lines = util.parse('d13.txt')
 # convert to int: int(str)
 # convert to str: str(any)
 # list(): [any,any,...]
@@ -19,12 +19,18 @@ def main():
     for m in machines:
         a = (int(re.search(Xpattern,m[0]).group(1)), int(re.search(Ypattern,m[0]).group(1)))
         b = (int(re.search(Xpattern,m[1]).group(1)), int(re.search(Ypattern,m[1]).group(1)))
-        p = (10000000000000 + int(re.search(Xpattern,m[2]).group(1)), 10000000000000 + int(re.search(Ypattern,m[2]).group(1)))
-        print("Running:",a,b,p)
-        possible = list()
-        recurse(a,b,p,(0,0),0,dict(),possible)
-        if possible:
-            totalMoney += min(possible)
+        # p = (10000000000000 + int(re.search(Xpattern,m[2]).group(1)), 10000000000000 + int(re.search(Ypattern,m[2]).group(1)))# part 2
+        p = (int(re.search(Xpattern,m[2]).group(1)), int(re.search(Ypattern,m[2]).group(1))) # part 1
+        # print("Running:",a,b,p)
+        press = math(a,b,p)
+        # print("Press", press)
+        totalMoney += press[0]*3 + press[1]
+        
+        # part 1 with DFS
+        # possible = list() 
+        # recurse(a,b,p,(0,0),0,dict(),possible)
+        # if possible:
+            # totalMoney += min(possible)
 
     print(totalMoney)
 def recurse(a,b,p, press, money, seen, possible):
@@ -57,7 +63,14 @@ def recurse(a,b,p, press, money, seen, possible):
     seen[press] = False
     return False
 
-
+def math(a,b,p):
+    bpress = (a[0]*p[1] - a[1]*p[0]) / (a[0]*b[1] - a[1]*b[0])
+    apress = (p[0] - bpress*b[0]) / a[0]
+    # has fraction, don't count
+    if apress - int(apress) > 0 or bpress - int(bpress) > 0:
+        return (0,0)
+    return (apress,bpress)
+    
 start = time.time()
 main()
 stop = time.time()
