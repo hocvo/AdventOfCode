@@ -34,7 +34,6 @@ def recurse(a,b,p, press, money, seen, possible):
     if p[0] < 0 or p[1] < 0:
         return False
     if p[0] == 0 and p[1] == 0:
-        print("found something")
         possible.append(money)
         return True
     #press b
@@ -42,8 +41,8 @@ def recurse(a,b,p, press, money, seen, possible):
     if bpress in seen:
         if seen[bpress]:
             possible.append(money+1)
-        return seen[bpress]
-    if press[1] < pressNum and recurse(a,b, (p[0]-b[0],p[1]-b[1]), bpress, money+1, seen,possible):
+            return seen[bpress]
+    if bpress not in seen and press[1] < pressNum and recurse(a,b, (p[0]-b[0],p[1]-b[1]), bpress, money+1, seen,possible):
         seen[bpress] = True
         return True
     #press a
@@ -51,8 +50,8 @@ def recurse(a,b,p, press, money, seen, possible):
     if apress in seen:
         if seen[apress]:
             possible.append(money+3)
-        return seen[apress]
-    if press[0] < pressNum and recurse(a,b, (p[0]-a[0],p[1]-a[1]), apress, money+3, seen,possible):
+            return seen[apress]
+    if apress not in seen and press[0] < pressNum and recurse(a,b, (p[0]-a[0],p[1]-a[1]), apress, money+3, seen,possible):
         seen[apress] = True
         return True
     seen[press] = False
@@ -63,4 +62,3 @@ start = time.time()
 main()
 stop = time.time()
 print("Main run in: ", stop-start, "seconds")
-#29024 too low
