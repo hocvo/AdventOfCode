@@ -30,9 +30,13 @@ def printList(l, delim = ' '):
     for item in l:
         if isinstance(item, list):
             printList(item)
-            logger.info()
+            logger.info('')
         else:
             logger.info(str(item) + delim)
+
+def printMatrix(m, delim = ''):
+    for row in m:
+        print(delim.join(row))
 
 # Python3 program to Split string into characters
 def split(word):
@@ -51,10 +55,10 @@ def sort(word):
 
 def column(matrix, i):
     return [row[i] for row in matrix]
-    
+
 # def diagonal(matrix, i):
     # return [row[i] for row in matrix]
-    
+
 def diagonalForward(matrix, i,j):
     l = list()
     c = j
@@ -79,7 +83,7 @@ def diagonalBackward(matrix, i,j):
 
 def diagonal(matrix):
     print("to be implemented")
-    
+
 def allNeighbors(matrix, i,j):
     print("cur: ", matrix[i][j])
     R = len(matrix)
@@ -120,7 +124,7 @@ def neighborsCrossIndex(matrix, i,j):
             if r >= 0 and r < R and c >= 0 and c < C:
                 res.append((r,c))
     return res
-    
+
 def neighborsX(matrix, i,j):
     neighbors = [(i-1,j-1),(i-1,j+1),(i+1,j-1),(i+1,j+1)]
     R = len(matrix)
