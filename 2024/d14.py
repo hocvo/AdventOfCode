@@ -7,6 +7,8 @@ import logging
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import numpy as np
+import random
+np.seterr(divide='ignore', invalid='ignore')
 lines = util.parse('d14.txt')
 logger = logging.getLogger('AoC')
 logging.basicConfig(filename='d14.log', level=logging.INFO)
@@ -27,7 +29,7 @@ XMID = int(XTILE/2)
 YTILE = 103
 #YTILE = 7
 YMID = int(YTILE/2)
-TIME = 100
+TIME = 8135
 def main():
     safeFactor = 0
     quad = [1,0,0,0,0]
@@ -50,50 +52,92 @@ def main():
             elif y > YMID:
                 quad[4] += 1
     safeFactor = reduce(mul, quad)
-    #print(quad)
+    print(quad)
     print(safeFactor)
-def main2():
-    minSec = 0
-    for i in range(100000):
-        pos = list()
-        for r in lines:
-            pMatch = re.search(Ppattern,r)
-            p = (int(pMatch.group(1)), int(pMatch.group(2)))
-            vMatch = re.search(Vpattern,r)
-            v = (int(vMatch.group(1)), int(vMatch.group(2)))
-            p = ((p[0]+v[0])% XTILE, (p[1]+v[1])%YTILE)
-            pos.append(p)
-        #util.printMatrix(m)
-    print(minSec)
-def createMatrix(pos):
-    m = list()
-    for i in range(YTILE):
-        m.append(list())
-        for j in range(XTILE):
-            if (i,j) in pos:
-                m[i].append('1')
-            else:
-                m[i].append('.')
-    return m
+
+def getNumCluster(m, p):
+    count = 0
+    q = list()
+    (x,y) = p
+    q.append((y,x))
+    seen = set()
+    while q:
+        (r,c) = q.pop(0)
+        if (r,c) in seen:
+            continue
+        seen.add((r,c))
+        count += 1
+        for (i,j) in util.neighborsCrossIndex(m,r,c):
+            if m[i][j] > 0:
+                q.append((i,j))
+    return count
+
+def visualize(frame):
+    global matrix, ani,plt
+    global i, maxCluster
+    # print(matrix)
+    # clus = (0,0)
+    for robot in robots:
+        clusterCount = getNumCluster(matrix,robot[0])
+        if clusterCount > maxCluster:
+            print("found higher cluster at ",i, clusterCount, robot[0])
+            # clus = robot[0]
+            # input("press enter to continue")
+            maxCluster = clusterCount
+    if i == 8149:
+        input("press enter to continue")
+        # ani.event_source.pause()
+        # plt.close()
+    i += 1
+    matrix = np.zeros((YTILE, XTILE), dtype=int)
+    for j in range(len(robots)):
+        (x,y) = robots[j][0]
+        v = robots[j][1]
+        (newX, newY) = ((x+v[0])%XTILE, (y+v[1])%YTILE)
+        robots[j] = ((newX, newY),v)
+        matrix[newY][newX] = 50
+    # for r in range(len(matrix)):
+        # for c in range(len(matrix[r])):
+            # if matrix[r][c] > 0:
+                # matrix[r][c] = matrix[r][c] - 25
+    
+    if i % 100 == 0:
+        print("i:",i)
+    # print(i,np.count_nonzero(matrix))
+    im.set_data(matrix)
+    return [im]
+
 def move(p, v, limit):
     newPos = (p + v*TIME) % limit
     return newPos
 
-start = time.time()
-#main()
-m = np.random.rand(5, 5)
-x = np.random.randn(50, 50)
-x[15, :] = 0.
-x[:, 40] = 0.
+# start = time.time()
+# main()
 
-plt.spy(x, precision = 0.1, markersize = 5)
+i = TIME
+matrix = np.zeros((YTILE, XTILE), dtype=int)
+maxCluster = 5
+fig, ax = plt.subplots()
+#init position
+robots = list()
+for r in lines:
+    pMatch = re.search(Ppattern,r)
+    p = (int(pMatch.group(1)), int(pMatch.group(2)))
+    vMatch = re.search(Vpattern,r)
+    v = (int(vMatch.group(1)), int(vMatch.group(2)))
+    x = move(p[0],v[0],XTILE)
+    y = move(p[1],v[1],YTILE)
+    robots.append(((x,y),v))
+    matrix[y][x] = 50
+# Create an image plot
+im = ax.imshow(matrix, cmap='cividis')
 
-main2()
-stop = time.time()
-print("Main run in: ", stop-start, "seconds")
-#73888848 too low
-#95670432 too low
-#226868688 too high
-#216115424 not right
-#220574870 swap X,Y TILE
-#214400550
+# print(matrix)
+# Create the animation
+ani = FuncAnimation(fig, visualize, frames=500, interval=1000, blit=False)
+
+# Show the animation
+plt.show()
+print(i)
+# stop = time.time()
+# print("Main run in: ", stop-start, "seconds")
