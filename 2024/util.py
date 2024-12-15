@@ -156,3 +156,11 @@ def splitOnElement(l, element):
             tmp.append(item)
     res.append(tmp)
     return res
+
+def find(matrix, value):
+    for r in range(len(matrix)):
+        row = matrix[r]
+        for c in range(len(row)):
+            if value == matrix[r][c]:
+                return (r,c)
+    return (-1,-1)
