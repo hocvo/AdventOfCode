@@ -70,6 +70,48 @@ def main():
     for box in boxes[1]:
         gps += box
     print(gps)
+    
+def shift(m, pos, direction):
+    (curR,curC) = pos
+    (nextR,nextC) = (curR + MV[direction][0], curC + MV[direction][1])
+    # print("shifting ",pos, "->", (nextR,nextC))
+    ret = False
+    shifted = True
+    if m[nextR,nextC] == "#":
+        return False
+    elif m[nextR,nextC] == "O":
+        shifted = shift(m, (nextR,nextC), direction)
+    if shifted:
+        # print("swapping",(curR,curC), "<->", (nextR,nextC))
+        m[nextR,nextC],m[curR,curC] = m[curR,curC],m[nextR,nextC]
+        ret = True
+    # print(m)
+    return ret
+def main2():
+    gps = 0
+    input = util.splitOnElement(lines, "")
+    m = input[0]
+    for i in range(len(m)):
+        m[i] = list(m[i])
+    m = np.matrix(m)
+    moves = input[1][0]
+    R = m.shape[0]
+    C = m.shape[1]
+    # print (m)
+    # print(moves)
+    
+    # print((curR,curC))
+    
+    for move in moves:
+        index = np.where(m == '@')
+        (curR,curC) = index[0][0], index[1][0]
+        shift(m, (curR,curC), move)
+    boxes = np.where(m == 'O')
+    for box in boxes[0]:
+        gps += 100* box
+    for box in boxes[1]:
+        gps += box
+    print(gps)
 start = time.time()
 main()
 stop = time.time()
