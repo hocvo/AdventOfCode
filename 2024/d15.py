@@ -9,6 +9,7 @@ from matplotlib.animation import FuncAnimation
 import numpy as np
 import random
 np.seterr(divide='ignore', invalid='ignore')
+np.set_printoptions(linewidth=100, formatter={'all': lambda x: f'{x:<1}'}) 
 lines = util.parse('d15.txt')
 #lines = util.parse('test.txt')
 # convert to int: int(str)
@@ -23,6 +24,7 @@ MV = {'v':(1,0),
       '^':(-1,0),
       '>':(0,1),
       '<':(0,-1)}
+      
 def main():
     gps = 0
     input = util.splitOnElement(lines, "")
@@ -39,81 +41,169 @@ def main():
     index = np.where(m == '@')
     (curR,curC) = index[0][0], index[1][0]
     # print((curR,curC))
-    
     for move in moves:
-        (nextR,nextC) = (curR + MV[move][0], curC + MV[move][1])
-        # print("moving from", move, (curR,curC), "to", (nextR,nextC))
-        if m[nextR,nextC] == "#":
-            continue
-        elif m[nextR,nextC] == "O":
-            (tmpR,tmpC) = (nextR,nextC)
-            while tmpR < R and tmpC < C:
-                (tmpR,tmpC) = (tmpR + MV[move][0], tmpC + MV[move][1])
-                # print("finding next available spot",(tmpR,tmpC))
-                if m[tmpR,tmpC] == "." or m[tmpR,tmpC] == "#":
-                    # print("found stop",m[tmpR,tmpC])
-                    break
-            if m[tmpR,tmpC] == '.':
-                while tmpR != curR or tmpC != curC:
-                    (backR,backC) = (tmpR + -1*MV[move][0], tmpC + -1*MV[move][1])
-                    # print("moving backward from",(tmpR,tmpC), "to", (backR,backC))
-                    m[backR,backC],m[tmpR,tmpC] = m[tmpR,tmpC],m[backR,backC]
-                    (tmpR,tmpC) = (backR,backC)
-                (curR,curC) = (nextR,nextC)
-        else:
-            m[nextR,nextC],m[curR,curC] = m[curR,curC],m[nextR,nextC]
-            (curR,curC) = (nextR,nextC)
-        # print(m)
+        (curR,curC) = shift(m, (curR,curC), move)
     boxes = np.where(m == 'O')
     for box in boxes[0]:
         gps += 100* box
     for box in boxes[1]:
         gps += box
     print(gps)
+
+# def main2():
+    # gps = 0
+    # input = util.splitOnElement(lines, "")
+    # m = input[0]
+    # for i in range(len(m)):
+        # m[i] = list(m[i])
+    # m = np.matrix(m)
+    # moves = input[1][0]
+    # R = m.shape[0]
+    # C = m.shape[1]
+    # # print (m)
+    # # print(moves)
+    
+    # index = np.where(m == '@')
+    # (curR,curC) = index[0][0], index[1][0]
+    # # print((curR,curC))
+    
+    # for move in moves:
+        # (nextR,nextC) = (curR + MV[move][0], curC + MV[move][1])
+        # # print("moving from", move, (curR,curC), "to", (nextR,nextC))
+        # if m[nextR,nextC] == "#":
+            # continue
+        # elif m[nextR,nextC] == "O":
+            # (tmpR,tmpC) = (nextR,nextC)
+            # while tmpR < R and tmpC < C:
+                # (tmpR,tmpC) = (tmpR + MV[move][0], tmpC + MV[move][1])
+                # # print("finding next available spot",(tmpR,tmpC))
+                # if m[tmpR,tmpC] == "." or m[tmpR,tmpC] == "#":
+                    # # print("found stop",m[tmpR,tmpC])
+                    # break
+            # if m[tmpR,tmpC] == '.':
+                # while tmpR != curR or tmpC != curC:
+                    # (backR,backC) = (tmpR + -1*MV[move][0], tmpC + -1*MV[move][1])
+                    # # print("moving backward from",(tmpR,tmpC), "to", (backR,backC))
+                    # m[backR,backC],m[tmpR,tmpC] = m[tmpR,tmpC],m[backR,backC]
+                    # (tmpR,tmpC) = (backR,backC)
+                # (curR,curC) = (nextR,nextC)
+        # else:
+            # m[nextR,nextC],m[curR,curC] = m[curR,curC],m[nextR,nextC]
+            # (curR,curC) = (nextR,nextC)
+        # # print(m)
+    # boxes = np.where(m == 'O')
+    # for box in boxes[0]:
+        # gps += 100* box
+    # for box in boxes[1]:
+        # gps += box
+    # print(gps)
     
 def shift(m, pos, direction):
     (curR,curC) = pos
     (nextR,nextC) = (curR + MV[direction][0], curC + MV[direction][1])
     # print("shifting ",pos, "->", (nextR,nextC))
-    ret = False
+    ret = pos
     shifted = True
     if m[nextR,nextC] == "#":
-        return False
+        return ret
     elif m[nextR,nextC] == "O":
-        shifted = shift(m, (nextR,nextC), direction)
-    if shifted:
+        ret = shift(m, (nextR,nextC), direction)
+    if ret != (nextR,nextC):
         # print("swapping",(curR,curC), "<->", (nextR,nextC))
         m[nextR,nextC],m[curR,curC] = m[curR,curC],m[nextR,nextC]
-        ret = True
+        ret = (nextR,nextC)
+    else:
+        ret = pos
     # print(m)
     return ret
+    
+def shift2(m, posList, direction):
+    objList = list()
+    # print("Processing", posList, [m[r,c] for (r,c) in posList])
+    for (curR,curC) in posList:
+        (nextR,nextC) = (curR + MV[direction][0], curC + MV[direction][1])
+        # print("Checking to move", (curR,curC), m[curR,curC], direction, (nextR,nextC), m[nextR,nextC])
+        if (nextR,nextC) in posList:
+            continue
+        if m[nextR,nextC] == "#":
+            return False
+        elif m[nextR,nextC] == "[":
+            if (nextR,nextC) not in objList:
+                objList.append((nextR,nextC))
+            if (nextR,nextC+1) not in objList:
+                objList.append((nextR,nextC+1))
+        elif m[nextR,nextC] == "]":
+            if (nextR,nextC) not in objList:
+                objList.append((nextR,nextC))
+            if (nextR,nextC-1) not in objList:
+                objList.append((nextR,nextC-1))
+    # print("object in the way:", objList, [m[r,c] for (r,c) in objList])
+    canShift = True
+    if elementIn(m, objList, {"[","]"}):
+        canShift = shift2(m, objList, direction)
+    # for (r,c) in objList:
+        # if m[r,c] != '.':
+            # canShift = False
+            # break
+    if canShift:
+        #todo shift all posList
+        # print("Doable, shifting all")
+        for i in reversed(range(len(posList))):
+            (curR,curC) = posList[i]
+            (nextR,nextC) = (curR + MV[direction][0], curC + MV[direction][1])
+            # print("swapping",(curR,curC), "<->", (nextR,nextC))
+            m[nextR,nextC],m[curR,curC] = m[curR,curC],m[nextR,nextC]
+    # print(m)
+    return canShift
+def elementIn(m, objList, vals):
+    for (r,c) in objList:
+        if m[r,c] in vals:
+            return True
+    return False
 def main2():
     gps = 0
-    input = util.splitOnElement(lines, "")
-    m = input[0]
+    input1 = util.splitOnElement(lines, "")
+    m = input1[0]
     for i in range(len(m)):
-        m[i] = list(m[i])
+        l = list()
+        for c in (m[i]):
+            if c == "#":
+                l.append("#")
+                l.append("#")
+            elif c == "O":
+                l.append("[")
+                l.append("]")
+            elif c == "@":
+                l.append("@")
+                l.append(".")
+            else:
+                l.append(".")
+                l.append(".")
+        m[i] = l
     m = np.matrix(m)
-    moves = input[1][0]
-    R = m.shape[0]
-    C = m.shape[1]
-    # print (m)
-    # print(moves)
+    moves = ''.join(input1[1])
+    print (m)
+    print(moves)
     
-    # print((curR,curC))
-    
+    index = np.where(m == '@')
+    (curR,curC) = index[0][0], index[1][0]
+    print((curR,curC))
+    i = 0
     for move in moves:
-        index = np.where(m == '@')
-        (curR,curC) = index[0][0], index[1][0]
-        shift(m, (curR,curC), move)
-    boxes = np.where(m == 'O')
+        # print("Moving @", move, i)
+        if shift2(m, [(curR,curC)], move):
+            (curR,curC) = (curR + MV[move][0], curC + MV[move][1])
+        # print(m)
+        i += 1
+    print (m)
+    boxes = np.where(m == '[')
     for box in boxes[0]:
         gps += 100* box
     for box in boxes[1]:
         gps += box
     print(gps)
 start = time.time()
-main()
+main2()
 stop = time.time()
 print("Main run in: ", stop-start, "seconds")
 
@@ -162,3 +252,5 @@ def visualize(frame):
     # print(i,np.count_nonzero(matrix))
     im.set_data(matrix)
     return [im]
+
+#1501335 too high
