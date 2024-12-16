@@ -1,3 +1,4 @@
+import numpy as np
 import logging
 logger = logging.getLogger('AoC')
 def parse(filename):
@@ -117,14 +118,14 @@ def neighborsCross(matrix, i,j):
 
 def neighborsCrossIndex(matrix, i,j):
     neighbors = [(i-1,j),(i+1,j),(i,j-1),(i,j+1)]
-    R = len(matrix)
-    C = len(matrix[0])
+    matrix = np.matrix(matrix)
+    R = matrix.shape[0]
+    C = matrix.shape[1]
     res = list()
     for (r,c) in neighbors:
             if r >= 0 and r < R and c >= 0 and c < C:
                 res.append((r,c))
     return res
-
 def neighborsX(matrix, i,j):
     neighbors = [(i-1,j-1),(i-1,j+1),(i+1,j-1),(i+1,j+1)]
     R = len(matrix)
