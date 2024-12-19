@@ -33,15 +33,15 @@ def main():
     m = np.matrix(m)
     R = m.shape[0]
     C = m.shape[1]
-    print (m)
+    # print (m)
     index = np.where(m == 'S')
     curPos = index[0][0], index[1][0]
     print("S pos",curPos)
     print("S", curPos)
     # dfs(m, set(), curPos, 0, 0)
     # print("DFS",MIN_SCORE)
-    MIN_SCORE = bfs(m, curPos, 0)
-    print("BFS",MIN_SCORE)
+    # MIN_SCORE = bfs(m, curPos, 0)
+    # print("BFS",MIN_SCORE)
     prev = dict()
     
     end = np.where(m == 'E')
@@ -49,32 +49,52 @@ def main():
     print("end pos",endPos)
     # MIN_SCORE = dijsktra2(m, curPos, prev)
     # MIN_SCORE = dijsktra(m, endPos, prev)
-    
-    tile = 0
-    q = [endPos]
-    while q:
-        curPos = q.pop(0)
-        if curPos in prev:
-            # print("tracing back", curPos, prev[curPos])
-            m[curPos] = 'O'
-            tile += 1
-            for p in prev[curPos]:
-                q.append(p)
+
     # print(m)
     # print("Dijsktra",MIN_SCORE, tile)
-    dist = np.full((m.shape[0],m.shape[1]), np.iinfo(np.int32).max)
+    dist = np.full((m.shape[0],m.shape[1]), 999999)
     face = np.zeros((m.shape[0],m.shape[1]), dtype=int)
-    minScore = dijsktra(m,dist, face,curPos, prev)
-    score = minScore
-    while score <= minScore:
-        q = [endPos]
-        while q:
-            curPos = q.pop(0)
-            if curPos in prev:
-                # print("tracing back", curPos, prev[curPos])
-                m[curPos] = '#'
-                tile += 1
+    minScore = dijsktra(m,dist, face,curPos, endPos, prev)
+    print("Init score",minScore)
+    tile = countTile(minScore, prev,m, set())
+    print(tile+1)
+def countTile(minScore, prev, m, seen):
+    tile = 0
+    
+    index = np.where(m == 'S')
+    if 0 == index[0].size:
+        return tile
+    startPos = index[0][0], index[1][0]
+    end = np.where(m == 'E')
+    endPos = end[0][0], end[1][0]
+
+    curPos = endPos
+    while curPos in prev:
+        curPos = prev[curPos]
+        # keep track of tile before the junction
+        if curPos in seen:
+            continue
+        seen.add(curPos)
+        tmp = m[curPos]
+        m[curPos] = "#" #block the path
         
+        # call dijsktra again
+        newPrev = dict()
+        dist = np.full((m.shape[0],m.shape[1]), 999999)
+        face = np.zeros((m.shape[0],m.shape[1]), dtype=int)
+        score = dijsktra(m, dist, face, startPos, endPos, newPrev)
+        # print("new score", score, "==", minScore)
+
+        # if score = min with blocked path, that mean there is a new path
+        # add count tile for new path before continue (cur path still block)
+        if score == minScore:
+            print("tile before new path",tile)
+            tile += countTile(minScore, newPrev, m, seen)
+        
+        #reset the path and count the current tile that is blocked
+        m[curPos] = tmp
+        tile += 1
+    return tile
 def dfs(m, seen, curPos, facing, curScore):
     global MIN_SCORE
     (curR,curC) = curPos
@@ -182,9 +202,10 @@ def dijsktra2(m, initPos, prev):
     # print(dist)
     return eScore
 
-def dijsktra(m, dist, face, initPos, prev):
-    eScore = 0
+def dijsktra(m, dist, face, initPos, endPos, prev):
+    eScore = 999999
     
+    # print(m)
     dist[initPos] = 0
     q = []
     for i in range(len(dist)):
@@ -201,18 +222,20 @@ def dijsktra(m, dist, face, initPos, prev):
             score = dist[curPos] + rot[1] + 1
             # print("Neighbors score:",n, rot, score)
             if score < dist[n]:
-                if m[n] == "E":
+                if n == endPos:
                     # print("Found End")
                     eScore = score
                 dist[n] = score
                 face[n] = rot[0]
-                if n in prev:
+                # if n in prev:
                     # print("Append new Prev to End", prev[n])
-                    prev[n].append(curPos)
-                else:
+                prev[n] = curPos
+                # else:
                     # print("Set new Prev to End")
-                    prev[n] = [curPos]
+                    # prev[n] = [curPos]
     # print(dist)
+    # print(eScore)
+    # input("continue")
     return eScore
 
 def getMin(q, dist):
@@ -257,4 +280,4 @@ print("Main run in: ", stop-start, "seconds")
 
 #89380 using SameSirSeen too high
 
-#445 too low
+#445 too low 10134 too high
