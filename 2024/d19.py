@@ -1,19 +1,13 @@
 import util
 import time
 import sys
-from operator import mul
-from functools import reduce
-import logging
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 import numpy as np
-import random
 from queue import PriorityQueue
 np.seterr(divide='ignore', invalid='ignore')
 np.set_printoptions(linewidth=100, formatter={'all': lambda x: f'{x:<1}'})
 
 sys.setrecursionlimit(99999)
-lines = util.parse('d19.txt')
+lines = util.parse('test.txt')
 #lines = util.parse('test.txt')
 # convert to int: int(str)
 # convert to str: str(any)
@@ -30,9 +24,9 @@ def main():
     countPos = 0
     # print(avail)
     for pattern in param[1]:
-        pos = recurse(avail, pattern)
-        if pos:
-            countPos += 1
+        print("Processing", pattern)
+        # pos += recurse(avail, pattern)
+        countPos += len(recurse2(avail,pattern))
     print(countPos)
 def recurse(avail, pattern):
     # print("Checking", pattern)
@@ -54,7 +48,30 @@ def recurse(avail, pattern):
     # print('Returning', possible)
     # input('continue')
     return possible
-    
+
+
+def recurse2(avail, pattern):
+    # print("Checking", pattern)
+    possible = set()
+    if pattern in seen:
+        # print("Found in seen")
+        return seen[pattern]
+    if pattern in avail:
+        # print("Found in avail")
+        possible.add(pattern)
+    for i in range(1,len(pattern)):
+        left = recurse2(avail, pattern[:i])
+        right = recurse2(avail, pattern[i:])
+        if len(left) > 0 and len(right) > 0:
+            for p1 in left:
+                for p2 in right:
+                    possible.add(p1 + ' ' + p2)
+        i -= 1
+    seen[pattern] = possible
+    # print('Returning', possible)
+    # print(seen)
+    # input('continue')
+    return possible
 start = time.time()
 main()
 stop = time.time()
