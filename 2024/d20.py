@@ -4,9 +4,8 @@ import re
 import random
 import numpy as np
 np.set_printoptions(linewidth=100, formatter={'all': lambda x: f'{x:<1}'})
-lines = util.parse('d20.txt')
-MSIZE = 71
-FALLEN = 1024
+lines = util.parse('test.txt')
+MAXTRIAL = 19
 MAXSIZE = 999999
 #lines = util.parse('test.txt')
 # convert to int: int(str)
@@ -50,35 +49,57 @@ def main():
             if m[n] == '.' or n == endPos:
                 time.append(n)
                 q.append(n)
-    seen = set()
-    save = {}
-    for i in range(1,len(time)):
+    # seen = set()
+    for i in range(len(time)):
+        seen = set()
         curPos = time[i]
         if curPos in seen:
             continue
         seen.add(curPos)
         for n in util.neighborsCrossIndex(m, curPos[0], curPos[1]):
             if m[n] == '#':
-                maxSave = 0
-                for n2 in util.neighborsCrossIndex(m, n[0], n[1]):
-                    if n2 == curPos:
-                        continue
-                    if m[n2] == '.' or n2 == endPos:
-                        saved = time.index(n2) - (i+2)
-                        # print("Found . at",n2, "save",saved)
-                        maxSave = max(maxSave, saved)
-                    # input('continue')
-                if maxSave > 0:
-                    save[n] = maxSave
-    count = 0
-    for k in save:
-        if save[k] >= 100:
-            count += 1
-        # print(save[k])
+                # startTime is i+1 because it's one block away from #
+                maxSave = recurse(m, time, n, i, endPos, MAXTRIAL-1, seen)
+                if maxSave >= 50:
+                    count += 1
+        # if curPos in seen:
+            # continue
+        # seen.add(curPos)
+        # for n in util.neighborsCrossIndex(m, curPos[0], curPos[1]):
+            # if m[n] == '#':
+                # maxSave = 0
+                # for n2 in util.neighborsCrossIndex(m, n[0], n[1]):
+                    # if n2 == curPos or n2 in seen:
+                        # continue
+                    # if m[n2] == '.' or n2 == endPos:
+                        # saved = time.index(n2) - (i+2)
+                        # # print("Found . at",n2, "save",saved)
+                        # maxSave = max(maxSave, saved)
+                    # # input('continue')
+                # if maxSave >= 64:
+                    # count += 1
     print(count)
     # print(save)
-    print(len(time))
-    
+    # print(len(time))
+def recurse(m, time, pos, startTime, endPos, trial, seen):
+    if trial < 0:
+        return 0
+    if pos in seen:
+        return 0
+    seen.add(pos)
+    maxSave = 0
+    for n2 in util.neighborsCrossIndex(m, pos[0], pos[1]):
+        if n2 == pos or n2 in seen:
+            continue
+        if m[n2] == '.' or n2 == endPos:
+            saved = time.index(n2) - (startTime+ MAXTRIAL-trial +1)
+            maxSave = max(maxSave, saved)
+            # print("Found . at",n2, "save",saved)
+        elif m[n2] == '#':
+            maxSave = max(maxSave, recurse(m, time, n2, startTime, endPos, trial - 1, seen))
+            # print("Found # at",n2, " recurse and save", maxSave)
+        # input('continue')
+    return maxSave
 def main2():
     count = 0
     endPos = (MSIZE-1,MSIZE-1)
@@ -178,3 +199,5 @@ start = time.time()
 main()
 stop = time.time()
 print("Main run in: ", stop-start, "seconds")
+
+#p2 5758 too low
