@@ -3,9 +3,10 @@ import time
 import re
 import random
 import numpy as np
-np.set_printoptions(linewidth=100, formatter={'all': lambda x: f'{x:<1}'})
+np.set_printoptions(linewidth=100, formatter={'all': lambda x: f'{x:<2}'})
+# np.set_printoptions(linewidth=100)
 lines = util.parse('test.txt')
-MAXTRIAL = 19
+MAXTRIAL = 20
 MAXSIZE = 999999
 #lines = util.parse('test.txt')
 # convert to int: int(str)
@@ -17,12 +18,13 @@ MAXSIZE = 999999
 # tuple():  An ordered, immutable collection of items (e.g., (1, 2, "apple"))
 # range: Represents a sequence of numbers (e.g., range(5), range(1, 5), range(1,5,2))
 
+count = 0
 def main():
-    count = 0
+    global count
     m = lines
     for i in range(len(m)):
         m[i] = list(m[i])
-    m = np.matrix(m)
+    m = np.matrix(m, np.dtype('U100'))
     R = m.shape[0]
     C = m.shape[1]
     index = np.where(m == 'S')
@@ -32,12 +34,14 @@ def main():
     end = np.where(m == 'E')
     endPos = end[0][0], end[1][0]
     print("end pos",endPos)
-    # print(m)
+    print(m)
     
     time = [start] #index = time, value = location
+    time2 = {start:0}
     q = []
     q.append(start)
     seen = set()
+    i = 0
     while q:
         curPos = q.pop(0)
         if curPos in seen:
@@ -48,20 +52,22 @@ def main():
                 continue
             if m[n] == '.' or n == endPos:
                 time.append(n)
+                i += 1
+                time2[n] = i
                 q.append(n)
     # seen = set()
+    maxSave = 0
     for i in range(len(time)):
-        seen = set()
+        seen = {}
         curPos = time[i]
         if curPos in seen:
             continue
-        seen.add(curPos)
         for n in util.neighborsCrossIndex(m, curPos[0], curPos[1]):
             if m[n] == '#':
                 # startTime is i+1 because it's one block away from #
-                maxSave = recurse(m, time, n, i, endPos, MAXTRIAL-1, seen)
-                if maxSave >= 50:
-                    count += 1
+                saved =recurse(m, time2, n, i, curPos, endPos, MAXTRIAL-1, seen)
+                maxSave = max(maxSave, saved)
+        # seen.remove(curPos)
         # if curPos in seen:
             # continue
         # seen.add(curPos)
@@ -78,28 +84,70 @@ def main():
                     # # input('continue')
                 # if maxSave >= 64:
                     # count += 1
+    count = 0
+    for k,v in processed.items():
+        if v == 70:
+            count += 1
+            # print(k)
     print(count)
+    # print("MaxSave", maxSave)
     # print(save)
     # print(len(time))
-def recurse(m, time, pos, startTime, endPos, trial, seen):
+processed = {}
+def recurse(m, time, pos, startTime, initPos, endPos, trial, seen):
+    # print(trial)
+    global count
     if trial < 0:
         return 0
-    if pos in seen:
+    if pos in seen and trial < seen[pos]:
         return 0
-    seen.add(pos)
+    seen[pos] = trial
+    R = m.shape[0]
+    C = m.shape[1]
+    if pos[0] == 0 or pos[0] == R-1 or pos[1] == 0 or pos[1] == C-1:
+        # seen.remove(pos)
+        return 0
     maxSave = 0
-    for n2 in util.neighborsCrossIndex(m, pos[0], pos[1]):
+    # print("Processing ", pos, MAXTRIAL-trial)
+    # tmp = m.copy()
+    # tmp[pos] = str(MAXTRIAL - trial)
+    # print(tmp)
+    # input('continue')
+    neighbors = util.neighborsCrossIndex(m, pos[0], pos[1])
+    neighbors.sort(key=lambda x: m[x],reverse=True)
+    for n2 in neighbors:
         if n2 == pos or n2 in seen:
             continue
+        # print("Processing n2", n2)
         if m[n2] == '.' or n2 == endPos:
-            saved = time.index(n2) - (startTime+ MAXTRIAL-trial +1)
-            maxSave = max(maxSave, saved)
+            saved = time[n2] - (startTime+ MAXTRIAL-trial +1)
+            # if initPos == (3,1):
+                # if endPos == n2:
+                    # print("found end", saved,startTime, MAXTRIAL,trial)
+                    # input('continue')
+            if (n2,initPos) in processed and saved > processed[(n2,initPos)]:
+                processed[(n2,initPos)] = saved
+            elif (n2,initPos) not in processed and saved > 0:
+                processed[(n2,initPos)] = saved
+            # maxSave = max(maxSave, saved)
+            # if n2 == endPos:
+                # return maxSave
+            # seen[n2] = trial-1
             # print("Found . at",n2, "save",saved)
         elif m[n2] == '#':
-            maxSave = max(maxSave, recurse(m, time, n2, startTime, endPos, trial - 1, seen))
+            recurse(m, time, n2, startTime, initPos, endPos, trial - 1, seen)
+            # maxSave = max(maxSave, recurse(m, time, n2, startTime, initPos, endPos, trial - 1, seen))
             # print("Found # at",n2, " recurse and save", maxSave)
         # input('continue')
+    # input('continue')
+    del seen[pos]
     return maxSave
+def BFS(m, time, startTime, initPos, endPos):
+    # q = []
+    # q.append((initPos,MAXTRIAL))
+    # while q:
+        # add to seen
+        # 
 def main2():
     count = 0
     endPos = (MSIZE-1,MSIZE-1)
