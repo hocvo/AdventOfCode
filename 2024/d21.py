@@ -34,6 +34,7 @@ DirectionalMoves = {'^':['','v','v<','v>','>'],
                    '>':['<^','<','<<','','^'],
                    'A':['<','v<','v<<','v']}
 DirectionalKeyMap = {'^':0,'v':1,'<':2,'>':3,'A':4}
+curKey = ['A','A','A'] #numpad, robot1, robot2
 def main():
     count = 0
     m = [['7','8','9'],['4','5','6'],['1','2','3'],['X','0','A']]
@@ -41,16 +42,28 @@ def main():
     print(m)
     lines = ['029A']
     for l in lines:
-        move = moveNumpad(l)
-        print("numpad",move)
-        # TODO add push A for each numpad key when moving the directional
-        move = moveDirectional(move)
-        move = moveDirectional(move)
-        move = moveDirectional(move)
-        count += int(l[:-1]) * len(move)
+        mCount = 0
+        prevK = 'A'
+        for k in l:
+            print("pressing",k)
+            numpad = moveNumpad(k, curKey[0]) + 'A'
+            print("numpad",move)
+            for numK in numpad:
+                robot1 = moveDirectional(numK, curKey[1]) + 'A'
+                for r1K in robot1:
+                    robot2 = moveDirectional(r1K, curKey[2])
+                    for r2K in robot2:
+                        human = moveDirectional(r2K+'A')
+            #move = moveDirectional(move+'A', curKey[2])
+            #move = moveDirectional(move+'A', prevK)
+            mCount += len(human)+1 #add A at the end for our own press
+            prevK = k
+            input('continue')
+        count += int(l[:-1]) * mCount
+        print(count)
     print(count)
-def moveNumpad(key):
-    curKey = 'A'
+def moveNumpad(key,curKey):
+    #curKey = 'A'
     count = ''
     for k in key:
         if curKey == 'A':
@@ -60,7 +73,7 @@ def moveNumpad(key):
         count += NumadMoves[k][curKey]
         curKey = k
     return count
-def moveDirectional(key):
+def moveDirectional(key,curKey):
     curKey = 'A'
     count = ''
     for k in key:
