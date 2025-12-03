@@ -1,81 +1,43 @@
 import util
 import time
-lines = util.parse('test.txt')
+lines = util.parse('d3.txt')
+
+def dfs(jolts, toggles):
+    if len(jolts) == toggles:
+        return sum(10 ** (toggles - i - 1) * x for i, x in enumerate(jolts))
+    if toggles == 1:
+        return max(jolts)
+    (n,idx) = (-1,0)
+    
+    # this is equivalent to the for loop below but have to switch idx to (-) in the return
+    # n, idx = max((x , -i) for (i, x) in enumerate(jolts[:-(toggles-1)]))
+    for i, x in enumerate(jolts[:-(toggles-1)]):
+        if x > n:
+            n = x
+            idx = i
+    return n * 10**(toggles-1) + dfs(jolts[idx+1:],toggles-1)
 
 def part1():
-    num = 50
-    count = 0
-    for l in lines:
-        firstI = 0
-        secondI = 0
-        max1 = 0
-        for i in range(0,len(l)-1):
-            num = int(l[i])
-            # print(num)
-            if num > max1:
-                max1 = num
-                firstI = i
-                # firstI = secondI
-                # secondI = i
-        max1 = 0
-        for i in range(firstI+1,len(l)):
-            if i == firstI:
-                continue
-            num = int(l[i])
-            if num > max1:
-                max1 = num
-                secondI = i
-        # print('first:', l[firstI], 'second:', l[secondI])
-        # if firstI > secondI:
-            # joltage = int(l[secondI])*10 + int(l[firstI])
-        # else:
-        joltage = int(l[firstI])*10 + int(l[secondI])
-        
-        count += joltage
-    print(count)
-
-#part 2
-def dfs(s,i,res, processed):
-    if len(res) == 12 or i >= len(s):
-        return int(res)
-    joltage = 0
-    if (i,res) in processed:
-        return processed[(i,res)]
-    for j in range(i,len(s)):
-        joltage = max(joltage, dfs(s,j+1,res+s[i],processed))
-    # if i in processed and processed[i] < joltage:
-    processed[(i,res)] = joltage
-    # print('done processing(',i,',',res,'):', joltage)
-    return joltage
-    # return max(dfs(s,i+1,res+s[i],processed), dfs(s,i+2,res+s[i],processed))
-    
-# def bfs(s, i, res):
-    
-
-def part2():
-    num = 50
     count = 0
     start = time.time()
     for l in lines:
-        joltage = 0
-        processed = {}
-        for i in range(0,len(l)-12):
-            joltage = max(joltage, dfs(l,i, '', processed))
-            # processed[i]=joltage
-        # joltage = max(joltage, dfs(l,3, l[2]))
-        print(joltage)
-        count += joltage
+        jolts = [int(i) for i in l.strip()]
+        count += dfs(jolts,2)
     stop = time.time()
     print(count)
     print(stop-start)
 
-def part3():
+def part2():
     count = 0
+    start = time.time()
     for l in lines:
-        for c in l:
-            num=int(c)
+        jolts = [int(i) for i in l.strip()]
+        count += dfs(jolts,12)
+    stop = time.time()
+    print(count)
+    print(stop-start)
 
-# part1()
+part1()
 part2()
 #166574147671929
 #167997792771560 too low
