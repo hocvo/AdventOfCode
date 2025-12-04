@@ -106,6 +106,16 @@ def allNeighborsIndex(matrix,i,j):
                 res.append((r,c))
     return res
 
+def allNeighborsIndexNp(matrix,i,j):
+    R = matrix.shape[0]
+    C = matrix.shape[1]
+    res = list()
+    for r in range(i-1, i+2):
+        for c in range(j-1, j+2):
+            if (r != i or c != j) and r >= 0 and r < R and c >= 0 and c < C:
+                res.append((r,c))
+    return res
+
 def neighborsCross(matrix, i,j):
     neighbors = [(i-1,j),(i+1,j),(i,j-1),(i,j+1)]
     R = len(matrix)

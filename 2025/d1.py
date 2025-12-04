@@ -17,7 +17,7 @@ def rotate(start, direction, turns):
         end += 100
     while end > 99:
         end -= 100
-    return (end, count)
+    return end, count
 
 def part1():
     num = 50
@@ -50,5 +50,5 @@ def part2():
 
 part1()
 part2()
-#5789 too lower
+#5789 too low
 #5984 too high
