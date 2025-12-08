@@ -19,56 +19,76 @@ def main():
             dist = calc_dist(junc_boxes[j], junc_boxes[i])
             dist_map[(i,j)] = dist
 
-    circuits = []
+    circuits = [set([i]) for i in range(len(lines))]
     heap = []
     sorted_dist_items = sorted(dist_map.items(), key=lambda item: item[1])
 
-    connections = 0
     idx = 0
     remain = set(range(len(lines)))
-    while idx < 1000:
+    last_junction =  sorted_dist_items[idx]
+    while idx < 1000: #part1
         closest = sorted_dist_items[idx]
         # print(junc_boxes[closest[0][0]], junc_boxes[closest[0][1]])
-        it = iter(circuits)
-        # c = next((x for x in circuits if closest[0][0] in x or closest[0][1] in x), set())
         cs = [x for x in circuits if closest[0][0] in x or closest[0][1] in x]
-        # prev_len = len(c)
-        if len(cs) == 0:
-            c = set()
-            c.add(closest[0][0])
-            c.add(closest[0][1])
-            circuits.append(c)
-            connections += 1
-        elif len(cs) == 1:
-            c = cs[0]
-            # print('adding',closest[0][0],closest[0][1], 'to set',c)
-            c.add(closest[0][0])
-            c.add(closest[0][1])
-            connections += 1
-        else:
-            # print('found',closest[0][0],closest[0][1], 'in 2 different set',cs)
-            cs[0].update(cs[1])
-            circuits.remove(cs[1])
-
-        # remain.discard(closest[0][0])
-        # remain.discard(closest[0][1])
-        # if len(c) > prev_len:
-            # connections += 1
-
-        # print('remain:',len(remain))
+        # print(cs)
+        if len(cs) < 2:
+            idx += 1
+            continue
+        cs[0].update(cs[1])
+        circuits.remove(cs[1])
+        # print(circuits)
+        last_junction =  sorted_dist_items[idx]
         idx += 1
-    for c in circuits:  
+    # use heapq or sort list both work
+    # for c in circuits:  
         # print(c)
-        heapq.heappush(heap, len(c))
-    while len(heap) > 3:
-        heapq.heappop(heap)
+        # heapq.heappush(heap, len(c))
+    # while len(heap) > 3:
+        # heapq.heappop(heap)
+    circuits.sort(key=len, reverse=True)
     cir_size = 1
-    while heap:
-        cir_size *= heapq.heappop(heap)
+    for i in range(3):
+        cir_size *= len(circuits[i])
     print(cir_size)
 
+def part2():
+    junc_boxes = []
+    dist_map = {}
+    for line in lines:
+        junc_boxes.append([int(x) for x in line.split(',')])
+    for i in range(len(junc_boxes)):
+        for j in range(i+1,len(junc_boxes)):
+            dist = calc_dist(junc_boxes[j], junc_boxes[i])
+            dist_map[(i,j)] = dist
+
+    circuits = [set([i]) for i in range(len(lines))]
+    heap = []
+    sorted_dist_items = sorted(dist_map.items(), key=lambda item: item[1])
+
+    idx = 0
+    remain = set(range(len(lines)))
+    last_junction =  sorted_dist_items[idx]
+    while len(circuits) > 1 and idx < len(sorted_dist_items): #part2
+    # while idx < 10: #part1
+        closest = sorted_dist_items[idx]
+        # print(junc_boxes[closest[0][0]], junc_boxes[closest[0][1]])
+        cs = [x for x in circuits if closest[0][0] in x or closest[0][1] in x]
+        # print(cs)
+        if len(cs) < 2:
+            idx += 1
+            continue
+        cs[0].update(cs[1])
+        circuits.remove(cs[1])
+        # print(circuits)
+        last_junction =  sorted_dist_items[idx]
+        idx += 1
+    print(junc_boxes[last_junction[0][0]],junc_boxes[last_junction[0][1]])
+    x1 = junc_boxes[last_junction[0][0]][0]
+    x2 = junc_boxes[last_junction[0][1]][0]
+    print(x1*x2)
 start = time.time()
 main()
+part2()
 stop = time.time()
 print('Finish in:',(stop-start)/1000,'s')
 
