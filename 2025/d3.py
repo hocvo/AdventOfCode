@@ -9,9 +9,10 @@ def dfs(jolts, toggles):
         return max(jolts)
     (n,idx) = (-1,0)
     
+    # find highest number in jolts but exclude some at the end for the rest of the toggles
     # this is equivalent to the for loop below but have to switch idx to (-) in the return
     # n, idx = max((x , -i) for (i, x) in enumerate(jolts[:-(toggles-1)]))
-    for i, x in enumerate(jolts[:-(toggles-1)]):
+    for i, x in enumerate(jolts[:-toggles+1]):
         if x > n:
             n = x
             idx = i
