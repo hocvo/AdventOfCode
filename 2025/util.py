@@ -175,3 +175,13 @@ def find(matrix, value):
             if value == matrix[r][c]:
                 return (r,c)
     return (-1,-1)
+
+
+# useful function
+#     xy is a list of tuple (x,y)
+#     # sorted_x = sorted(xy, key=lambda x: (x[0],x[1]))
+#     # sorted_y = sorted(xy, key=lambda x: (x[1],x[0]))
+#     max_x = max(xy, key=lambda x: x[0])
+#     min_x = min(xy, key=lambda x: x[0])
+#     max_y = max(xy, key=lambda x: x[1])
+#     min_y = min(xy, key=lambda x: x[1])
