@@ -21,45 +21,21 @@ def part1():
             max_area = max(max_area, area(xy,i,j))
     print(max_area)
 
-def is_covered(testx, testy, x, dx, y, dy):
-    if dx > 0 and dy > 0:
-        if testx >= x and testy >= y:
-            return True
-    elif dx > 0 and dy < 0:
-        if testx >= x and testy <= y:
-            return True
-    elif dx < 0 and dy < 0:
-        if testx <= x and testy <= y:
-            return True
-    elif dx < 0 and dy > 0:
-        if testx <= x and testy >= y:
-            return True
-    return False
+def is_covered(testx, testy,xy, max_x, max_y):
+    return True
         
-def check_green(xy, x1,y1,x2,y2):
+def check_green(xy, x1,y1,x2,y2,max_x, max_y):
     if x1 == x2 or y1 == y2:
         return True
     # points to find
     x,y = x1,y2
-    dx,dy = (x1-x2),-(y1-y2)
     xx,yy = x2,y1
-    dxx,dyy = -dx,-dy
+    return is_covered(x,y,xy,max_x,max_y) & is_covered(xx,yy,xy,max_x,max_y)
 
-    found_xy = False
-    found_xxyy = False
-    for testx,testy in xy:
-        if not found_xy:
-            found_xy = is_covered(testx, testy, x, dx, y, dy)
-        if not found_xxyy:
-            found_xxyy = is_covered(testx, testy, xx, dxx, yy, dyy)
-        if found_xxyy and found_xy:
-            break
-    return found_xy & found_xxyy
-
-def area2(xy, i, j):
+def area2(xy, i, j, max_x, max_y):
     x1,y1 = xy[i]
     x2,y2 = xy[j]
-    if check_green(xy,x1,y1,x2,y2):
+    if check_green(xy,x1,y1,x2,y2, max_x,max_y):
         return (abs(x1-x2)+1) * (abs(y1-y2)+1)
     return 0
 
@@ -71,13 +47,15 @@ def part2():
         x,y = int(x),int(y)
         xy.append((x,y))
 
+    max_x = max(xy, key=lambda x: x[0])
+    max_y = max(xy, key=lambda x: x[1])
     fig, ax = plt.subplots()
     ax.scatter([x[0] for x in xy], [x[1] for x in xy], color='blue', label='Initial Points')
     plt.show()
     prev_max = max_area
     for i in range(len(xy)):
         for j in range(i+1,len(xy)):
-            test_area = area2(xy,i,j)
+            test_area = area2(xy,i,j,max_x,max_y)
             max_area = max(max_area, test_area)
             # print('area:', xy[i],xy[j], test_area)
             if max_area > prev_max:
