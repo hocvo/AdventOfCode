@@ -1,8 +1,8 @@
 import util
 import time
-# import matplotlib.pyplot as plt
-# import numpy as np
-lines = util.parse('d9.txt')
+import matplotlib.pyplot as plt
+import numpy as np
+lines = util.parse('test.txt')
 
 def area(xy, i, j):
     x1,y1 = xy[i]
@@ -22,8 +22,9 @@ def part1():
     print(max_area)
 
 def is_covered(testx, testy,xy):
-    return util.pointInPolygon2D(testx, testy,xy)
-        
+    # return util.pointInPolygon2D(testx, testy,xy)
+    return util.point_in_polygon((testx,testy),xy)
+
 def check_green(xy, x1,y1,x2,y2):
     if x1 == x2 or y1 == y2:
         return True
@@ -50,8 +51,9 @@ def part2():
     # max_x = max(xy, key=lambda x: x[0])
     # max_y = max(xy, key=lambda x: x[1])
     # fig, ax = plt.subplots()
-    # ax.scatter([x[0] for x in xy], [x[1] for x in xy], color='blue', label='Initial Points')
-    # plt.show()
+    xy_plot = xy + [xy[0]]
+    plt.plot([x[0] for x in xy_plot], [x[1] for x in xy_plot], color='blue', label='Initial Points')
+    plt.show()
     prev_max = max_area
     for i in range(len(xy)):
         for j in range(i+1,len(xy)):
