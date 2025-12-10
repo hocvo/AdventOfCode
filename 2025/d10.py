@@ -2,26 +2,26 @@ import util
 import time
 import matplotlib.pyplot as plt
 import numpy as np
-lines = util.parse('test.txt')
+lines = util.parse('d10.txt')
 
 def press_button(btns, last_press_idx, cur_press, expect_ind, cur_ind, seen_ind, res):
-    if len(cur_press) > 5:
-        return False
+    # if len(cur_press) > 5:
+    #     return False
     if expect_ind == cur_ind:
         return True
     if tuple(cur_ind) in seen_ind and len(cur_press) > 0: #prevent loop
         return False
 
-    for i in range(len(btns)):
+    for i in range(last_press_idx+1,len(btns)):
         copy_seen_ind = set(seen_ind)
         copy_cur_press = list(cur_press)
-        if i != last_press_idx:
-            for ind_idx in btns[i]:
-                cur_ind[ind_idx] = cur_ind[ind_idx] * -1
-            copy_cur_press.append(btns[i])
-            if press_button(btns, i, copy_cur_press, expect_ind, cur_ind, copy_seen_ind, res):
-                res.add(len(copy_cur_press))
-            seen_ind.add(tuple(cur_ind))
+        copy_cur_ind = list(cur_ind)
+        for ind_idx in btns[i]:
+            copy_cur_ind[ind_idx] = copy_cur_ind[ind_idx] * -1
+        copy_cur_press.append(btns[i])
+        if press_button(btns, i, copy_cur_press, expect_ind, copy_cur_ind, copy_seen_ind, res):
+            res.add(len(copy_cur_press))
+        seen_ind.add(tuple(cur_ind))
     return False
 
 def part1():
@@ -51,18 +51,19 @@ def part1():
         j_open = line.index('{')
         j_close = line.index('}')
         joltages.append(list(map(int,line[j_open+1:j_close].split(','))))
-        # for ()
-    print(indicators)
-    print(buttons)
-    print(joltages)
+    # print(indicators)
+    # print(buttons)
+    # print(joltages)
+    count = 0
     for i in range(len(indicators)):
         cur_ind = [-1 for i in indicators[i]]
         seen_ind = set()
         seen_ind.add(tuple(cur_ind))
         res = set()
         press_button(buttons[i],-1,list(),indicators[i],cur_ind, seen_ind,res)
-        print(min(res))
+        count += min(res)
         #print(press_button(buttons[i],-1,5,0,indicators[i],cur_ind, seen_ind))
+    print(count)
 start = time.time()
 part1()
 #part2()
