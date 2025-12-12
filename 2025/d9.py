@@ -1,8 +1,8 @@
 import util
 import time
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy as np
-lines = util.parse('test.txt')
+lines = util.parse('d9.txt')
 
 def area(xy, i, j):
     x1,y1 = xy[i]
@@ -22,8 +22,8 @@ def part1():
     print(max_area)
 
 def is_covered(testx, testy,xy):
-    # return util.pointInPolygon2D(testx, testy,xy)
-    return util.point_in_polygon((testx,testy),xy)
+    return util.pointInPolygon2D(testx, testy,xy)
+    # return util.point_in_polygon((testx,testy),xy)
 
 def check_green(xy, x1,y1,x2,y2):
     if x1 == x2 or y1 == y2:
@@ -31,7 +31,25 @@ def check_green(xy, x1,y1,x2,y2):
     # points to find
     x,y = x1,y2
     xx,yy = x2,y1
-    return is_covered(x,y,xy) & is_covered(xx,yy,xy)
+    rec_seg = [[(x1,y1),(x1,y2)],[(x1,y2),(x2,y2)],[(x2,y2),(x2,y1)],[(x2,y1),(x1,y1)]]
+    # check all 4 legs:
+    for seg in rec_seg:
+        if util.intersect_polygon(seg, xy):
+            return False
+    # for y in range(min(y1,y2),max(y1,y2)+1):
+    #     if not is_covered(x1,y,xy):
+    #         return False
+    #     if not is_covered(x2,y,xy):
+    #         return False
+    #
+    # for x in range(min(x1,x2),max(x1,x2)+1):
+    #     if not is_covered(x,y1,xy):
+    #         return False
+    #     if not is_covered(x,y2,xy):
+    #         return False
+
+    return True
+    # return is_covered(x,y,xy) & is_covered(xx,yy,xy)
 
 def area2(xy, i, j):
     x1,y1 = xy[i]
@@ -52,8 +70,8 @@ def part2():
     # max_y = max(xy, key=lambda x: x[1])
     # fig, ax = plt.subplots()
     xy_plot = xy + [xy[0]]
-    plt.plot([x[0] for x in xy_plot], [x[1] for x in xy_plot], color='blue', label='Initial Points')
-    plt.show()
+    # plt.plot([x[0] for x in xy_plot], [x[1] for x in xy_plot], color='blue', label='Initial Points')
+    # plt.show()
     prev_max = max_area
     for i in range(len(xy)):
         for j in range(i+1,len(xy)):

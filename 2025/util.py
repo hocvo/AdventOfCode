@@ -214,12 +214,12 @@ def doIntersect(seg1,seg2):
 
     # special cases
     # p1, q1 and p2 are collinear and p2 lies on segment p1q1
-    if o1 == 0 and onSegment(seg1[0], seg2[0], seg1[1]):
-        return True
+    # if o1 == 0 and onSegment(seg1[0], seg2[0], seg1[1]):
+    #     return True
 
-    # p1, q1 and q2 are collinear and q2 lies on segment p1q1
-    if o2 == 0 and onSegment(seg1[0], seg2[1], seg1[1]):
-        return True
+    # # p1, q1 and q2 are collinear and q2 lies on segment p1q1
+    # if o2 == 0 and onSegment(seg1[0], seg2[1], seg1[1]):
+    #     return True
 
     # p2, q2 and p1 are collinear and p1 lies on segment p2q2
     if o3 == 0 and onSegment(seg2[0], seg1[0], seg2[1]):
@@ -230,23 +230,32 @@ def doIntersect(seg1,seg2):
         return True
 
     return False
-    
+
+def intersect_polygon(seg, polygon):
+    for i in range(len(polygon)):
+        polygon_segment = [polygon[i],polygon[(i+1)%len(polygon)]]
+        if doIntersect(seg,polygon_segment):
+            return True
+    return False
+
 # assume 0,0 is at top left. +x going right
 # +y is going down
 def pointInPolygon2D(x,y,xy):
     #test horizon:
-    segment = [(0,y),(x,y)]
+    segment = [(0,0),(x,y)]
     horizontal_count = 0
     for i in range(len(xy)):
         polygon_segment = [xy[i],xy[(i+1)%len(xy)]]
+        if (x,y) == xy[i]:
+            horizontal_count += 1
         horizontal_count += 1 if doIntersect(segment, polygon_segment) else 0
-    
+
     #test vertical:
     segment = [(x,0),(x,y)]
     vertical_count = 0
-    for i in range(len(xy)):
-        polygon_segment = [xy[i],xy[(i+1)%len(xy)]]
-        vertical_count += 1 if doIntersect(segment, polygon_segment) else 0
+    # for i in range(len(xy)):
+    #     polygon_segment = [xy[i],xy[(i+1)%len(xy)]]
+    #     vertical_count += 1 if doIntersect(segment, polygon_segment) else 0
     if horizontal_count%2 == 1 or vertical_count%2 == 1:
         return True
     # print((x,y), 'is not inside')
