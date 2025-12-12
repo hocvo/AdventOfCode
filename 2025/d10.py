@@ -1,8 +1,7 @@
 import util
 import time
-import matplotlib.pyplot as plt
 import numpy as np
-lines = util.parse('d10.txt')
+lines = util.parse('test.txt')
 
 def press_button(btns, last_press_idx, cur_press, expect_ind, cur_ind, seen_ind, res):
     # if len(cur_press) > 5:
@@ -19,10 +18,55 @@ def press_button(btns, last_press_idx, cur_press, expect_ind, cur_ind, seen_ind,
         for ind_idx in btns[i]:
             copy_cur_ind[ind_idx] = copy_cur_ind[ind_idx] * -1
         copy_cur_press.append(btns[i])
-        if press_button(btns, i, copy_cur_press, expect_ind, copy_cur_ind, copy_seen_ind, res):
+        found = press_button(btns, i, copy_cur_press, expect_ind, copy_cur_ind, copy_seen_ind, res)
+        if found:
             res.add(len(copy_cur_press))
         seen_ind.add(tuple(cur_ind))
     return False
+
+def press_button_jolt(btns, press_idx, cur_press, cur_jol, seen, res):
+    if res:
+        min_press = min(res)
+        if len(cur_press) >= min_press:
+            return False
+    if tuple(cur_jol) in seen:
+        res.add(len(cur_press) + seen[tuple(cur_jol)])
+        return True
+    if any(x < 0 for x in cur_jol):
+        return False
+
+    found = False
+    for i in range(len(btns)):
+        copy_cur_press = list(cur_press)
+        copy_cur_jol = list(cur_jol)
+        for jol_idx in btns[i]:
+            copy_cur_jol[jol_idx] -= 1
+        copy_cur_press.append(btns[i])
+        found1 = press_button_jolt(btns, press_idx, copy_cur_press, copy_cur_jol, seen, res)
+        if found1:
+            found = True
+            seen[tuple(cur_jol)] = 1 + seen[tuple(copy_cur_jol)]
+    return found
+
+def press_button_jolt2(btns, cur_jol, seen, cur_press):
+    if all(0==x for x in cur_jol):
+        return cur_press
+    if tuple(cur_jol) in seen:
+        return seen[tuple(cur_jol)]
+    if any(x < 0 for x in cur_jol):
+        return 9999999999
+    press_count = 9999999999
+    for i in range(len(btns)):
+        copy_cur_jol = list(cur_jol)
+        for jol_idx in btns[i]:
+            copy_cur_jol[jol_idx] -= 1
+        press_count = min(press_count, press_button_jolt2(btns, copy_cur_jol, seen, cur_press+1))
+    if tuple(cur_jol) in seen:
+        seen[tuple(cur_jol)] = min(seen[tuple(cur_jol)],press_count)
+        press_count = seen[tuple(cur_jol)]
+    else:
+        seen[tuple(cur_jol)] = press_count
+    return press_count
 
 def part1():
     indicators = []
@@ -54,40 +98,24 @@ def part1():
     # print(indicators)
     # print(buttons)
     # print(joltages)
-    count = 0
+    count_ind = 0
     for i in range(len(indicators)):
         cur_ind = [-1 for i in indicators[i]]
         seen_ind = set()
         seen_ind.add(tuple(cur_ind))
         res = set()
         press_button(buttons[i],-1,list(),indicators[i],cur_ind, seen_ind,res)
-        count += min(res)
-        #print(press_button(buttons[i],-1,5,0,indicators[i],cur_ind, seen_ind))
-    print(count)
+        count_ind += min(res)
+    print(count_ind)
+    count_jol = 0
+    for i in range(len(joltages)):
+        seen = {tuple([0 for x in joltages[i]]): 1}
+        buttons[i].sort(key=len,reverse=True)
+        count_jol += press_button_jolt2(buttons[i],joltages[i],seen, 0)
+        print(count_jol)
+    print(count_jol)
+
 start = time.time()
 part1()
 #part2()
 stop = time.time()
-
-def press_button2(btns, last_press_idx, min_press, cur_press, expect_ind, cur_ind, seen_ind):
-    if cur_press >= min_press:
-        return min_press
-    if expect_ind == cur_ind:
-        return min(min_press,cur_press)
-    if tuple(cur_ind) in seen_ind and cur_press > 0: #prevent loop
-        return cur_press
-
-    # min_count = 999999
-    count_press = cur_press
-    for i in range(len(btns)):
-        if i != last_press_idx:
-            for ind_idx in btns[i]:
-                cur_ind[ind_idx] = cur_ind[ind_idx] * -1
-            count_press = press_button(btns, i, min_press, cur_press+1, expect_ind, cur_ind, seen_ind)
-            if cur_ind == expect_ind:
-                min_press = count_press
-            seen_ind.add(tuple(cur_ind))
-            # if count_press <= min_press:
-            #     return count_press
-            # count_press = min(min_press,count_press)
-    return min_press
